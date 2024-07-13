@@ -1,11 +1,6 @@
 #include "main.h"
 
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
+// When Center Button Pressed
 void on_center_button() {
 	static bool pressed = false;
 	pressed = !pressed;
@@ -16,12 +11,7 @@ void on_center_button() {
 	}
 }
 
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
+// When Start
 void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
@@ -29,28 +19,16 @@ void initialize() {
 	pros::lcd::register_btn1_cb(on_center_button);
 }
 
-/**
- * Runs while the robot is in the disabled state of Field Management System or
- * the VEX Competition Switch, following either autonomous or opcontrol. When
- * the robot is enabled, this task will exit.
- */
+// When Disabled
 void disabled() {}
 
-/**
- * Runs after initialize(), and before autonomous when connected to the Field
- * Management System or the VEX Competition Switch. This is intended for
- * competition-specific initialization routines, such as an autonomous selector
- * on the LCD.
- *
- * This task will exit when the robot is enabled and autonomous or opcontrol
- * starts.
- */
+// When Connect to Field Control
 void competition_initialize() {}
 
-// Autonomous
+// When Autonomous
 void autonomous() {}
 
-// Driver Control
+// When Driver Control
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER); 	// Creates Primary Controller
 	pros::MotorGroup left_mg({1, 2});    					// Creates Left Motor Group with ports 1 & 2
