@@ -1,7 +1,7 @@
 // pros upload --icon 'planet'
 
 // Include Libraries
-#include "main.h"
+#include "main.h"											// Include PROS Core Library
 
 // Include other Files
 	//note to self - figure out how to reference other files for ui and other stuff
@@ -11,9 +11,9 @@ void on_center_button() {}
 
 // When Start
 void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "9039T - AbDUCKted");
-	pros::lcd::register_btn1_cb(on_center_button);
+	pros::lcd::initialize();								// Initialize Brain LCD
+	pros::lcd::set_text(1, "9039T - AbDUCKted");			// Temporary Text Display Code
+	pros::lcd::register_btn1_cb(on_center_button);			// Temporary
 }
 
 // When Disabled
@@ -35,7 +35,7 @@ void opcontrol() {
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
+		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  
 
 		// Arcade control scheme
 		int left = master.get_analog(ANALOG_LEFT_Y);   	 	// Gets Left Stick Up/Down Value
