@@ -1,4 +1,14 @@
+/*
+	On upload type, 
+		pros upload --icon 'planet'
+	in terminal to add icon.
+*/
+
+// Include Libraries
 #include "main.h"
+
+// Include Other Files
+#include "ui.cpp"
 
 // When Center Button Pressed
 void on_center_button() {
@@ -15,7 +25,6 @@ void on_center_button() {
 void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
-
 	pros::lcd::register_btn1_cb(on_center_button);
 }
 
