@@ -1,22 +1,17 @@
+// pros upload --icon 'planet'
+
+// Include Libraries
 #include "main.h"
 
 // Include other Files
 
 // When Center Button Pressed
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
+void on_center_button() {}
 
 // When Start
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
+	pros::lcd::set_text(1, "9039T - AbDUCKted");
 	pros::lcd::register_btn1_cb(on_center_button);
 }
 
