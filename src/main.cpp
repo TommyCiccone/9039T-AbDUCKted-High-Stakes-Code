@@ -4,6 +4,7 @@
 #include "main.h"
 
 // Include other Files
+	//note to self - figure out how to reference other files for ui and other stuff
 
 // When Center Button Pressed
 void on_center_button() {}
