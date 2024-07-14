@@ -1,5 +1,3 @@
-// pros upload --icon 'planet'
-
 // Include Libraries
 #include "main.h"											// Include PROS Core Library
 
