@@ -28,7 +28,7 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER); 	// Creates Primary Controller
 	pros::MotorGroup left_mg({-1, -2});						// Creates Left Motor Group with ports 1 & 2
 	pros::MotorGroup right_mg({3, 4});  					// Creates Right Motor Group with ports 3 & 4
-	pros::ADIDigitalOut clamp ('A');							// Initialize Goal Clamp Piston
+	pros::ADIDigitalOut clamp ('A');						// Initialize Goal Clamp Piston
 
 
 	while (true) {
