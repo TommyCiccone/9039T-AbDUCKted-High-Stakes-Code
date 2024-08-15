@@ -1,33 +1,33 @@
 // Include Libraries
 #include "main.h"											// Include PROS Core Library
-
-#include "project/ui.hpp"
-#include "project/auton.hpp"
-
-#include "liblvgl/lvgl.h"
-
-// Include other Files
-	//note to self - figure out how to reference other files for ui and other stuff
+#include "project/auton.hpp"								// Include Auton Header File
+#include "liblvgl/lvgl.h"									// Include LVGL, a lightweight graphics library
 
 // When Center Button Pressed
 void on_center_button() {}
 
 // When Start
 void initialize() {
-	lv_obj_set_style_text_font(lv_scr_act(), &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+	lv_obj_set_style_text_font(								// Set font size to 24 pt.
+		lv_scr_act(), 
+		&lv_font_montserrat_24, 
+		LV_PART_MAIN | LV_STATE_DEFAULT
+	);
 
-	lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());
-    lv_obj_t * autonRoller = lv_roller_create(activeScreen);
+	lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());	// Creates activeScreen parent object
+    lv_obj_t * autonRoller = lv_roller_create(activeScreen);// Creates a roller object as a child of the activeScreen parent
 
-    lv_roller_set_options(autonRoller, auton::autonNames.c_str(), LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_options(									// Configure Roller
+		autonRoller, 
+		auton::autonNames.c_str(),
+		LV_ROLLER_MODE_INFINITE
+	);
     lv_roller_set_visible_row_count(autonRoller, 4);
 
-
-
-	lv_obj_set_size(activeScreen, 480, 272);
+	lv_obj_set_size(activeScreen, 480, 272);				// Configure size & position of activeScreen Parent
 	lv_obj_center(activeScreen);
 
-	lv_obj_set_size(autonRoller, 400, 232);
+	lv_obj_set_size(autonRoller, 400, 232);					// Configure size & position of roller object
     lv_obj_center(autonRoller);
 }
 
