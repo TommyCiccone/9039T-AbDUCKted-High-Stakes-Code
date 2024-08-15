@@ -1,6 +1,11 @@
 // Include Libraries
 #include "main.h"											// Include PROS Core Library
 
+#include "project/ui.hpp"
+#include "project/auton.hpp"
+
+#include "liblvgl/lvgl.h"
+
 // Include other Files
 	//note to self - figure out how to reference other files for ui and other stuff
 
@@ -9,9 +14,21 @@ void on_center_button() {}
 
 // When Start
 void initialize() {
-	pros::lcd::initialize();								// Initialize Brain LCD
-	pros::lcd::set_text(1, "9039T - AbDUCKted");			// Temporary Text Display Code
-	pros::lcd::register_btn1_cb(on_center_button);			// Temporary
+	lv_obj_set_style_text_font(lv_scr_act(), &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+	lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());
+    lv_obj_t * autonRoller = lv_roller_create(activeScreen);
+
+    lv_roller_set_options(autonRoller, auton::autonNames.c_str(), LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_visible_row_count(autonRoller, 4);
+
+
+
+	lv_obj_set_size(activeScreen, 480, 272);
+	lv_obj_center(activeScreen);
+
+	lv_obj_set_size(autonRoller, 400, 232);
+    lv_obj_center(autonRoller);
 }
 
 // When Disabled
