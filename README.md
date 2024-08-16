@@ -23,6 +23,10 @@ File Descriptions:
         liblvgl                   Folder containing many graphics library, created automatically
     
         pros                      Folder containing many PROS libraries, created automatically
+
+        project                   Folder containing custom headers referenced by the .cpp files
+
+            auton.hpp                Custom header containing a list of auton routines
     
         api.h                     Core PROS Library, created automatically
     
