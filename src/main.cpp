@@ -10,23 +10,29 @@ void on_center_button() {}
 void initialize() {
 	lv_obj_set_style_text_font(								// Set font size to 24 pt.
 		lv_scr_act(), 
-		&lv_font_montserrat_24, 
+		&lv_font_montserrat_36, 
 		LV_PART_MAIN | LV_STATE_DEFAULT
 	);
-
 	lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());	// Creates activeScreen parent object
     lv_obj_t * autonRoller = lv_roller_create(activeScreen);// Creates a roller object as a child of the activeScreen parent
-
     lv_roller_set_options(									// Configure Roller
 		autonRoller, 
 		auton::autonNames.c_str(),
 		LV_ROLLER_MODE_INFINITE
 	);
     lv_roller_set_visible_row_count(autonRoller, 4);
-
+    lv_obj_set_style_bg_color(								// Set highlight color of selected choice to a bold yellow
+		autonRoller, 
+		lv_color_hex(0xFFFF00), 
+		LV_PART_SELECTED
+	);
+    lv_obj_set_style_text_color(							// Set text color to black
+		autonRoller, 
+		lv_color_hex(0x000000), 
+		LV_PART_SELECTED
+	);
 	lv_obj_set_size(activeScreen, 480, 272);				// Configure size & position of activeScreen Parent
 	lv_obj_center(activeScreen);
-
 	lv_obj_set_size(autonRoller, 400, 232);					// Configure size & position of roller object
     lv_obj_center(autonRoller);
 }

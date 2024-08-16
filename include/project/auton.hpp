@@ -5,8 +5,9 @@
 namespace auton {                                          // Creates "auton" namespace
     enum class AutonSelect : int {                         // List of autons to be selected for internal operations
         disabled,
-        test_one
+        filler_routine
     };
 
-const std::string autonNames = "Disabled\nTest One\n";     // List of autons to be selected for display
+const std::string autonNames =                             // List of autons to be selected for display
+    "Disabled\nFiller Routine\n";                           
 }
