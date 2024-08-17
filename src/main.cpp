@@ -3,11 +3,14 @@
 #include "project/auton.hpp"								// Include Auton Header File
 #include "liblvgl/lvgl.h"									// Include LVGL, a lightweight graphics library
 
+int autonIndex = 0;											// Declares an int for storing the selected auton routine.
+
 // When Center Button Pressed
 void on_center_button() {}
 
 // When Start
 void initialize() {
+// All code here will be moved to "void competition_initialize() later. at the time of testing I don't have a comp switch."
 	lv_obj_set_style_text_font(								// Set font size to 36 pt.
 		lv_scr_act(), 
 		&lv_font_montserrat_36, 
@@ -36,6 +39,10 @@ void initialize() {
 	);
 	lv_obj_set_size(autonRoller, 470, 220);					// Configure size & position of roller object
 	lv_obj_center(autonRoller);
+
+	while (true) {
+		autonIndex = lv_roller_get_selected(autonRoller);
+	};
 }
 
 // When Disabled
@@ -45,7 +52,9 @@ void disabled() {}
 void competition_initialize() {}
 
 // When Autonomous
-void autonomous() {}
+void autonomous() {
+//	if (autonIndex = #) {//auton code here};
+}
 
 // When Driver Control
 void opcontrol() {
