@@ -4,6 +4,8 @@
 #include "liblvgl/lvgl.h"									// Include LVGL, a lightweight graphics library
 
 int autonIndex = 0;											// Declares an int for storing the selected auton routine.
+lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());		// Creates activeScreen parent object
+lv_obj_t * autonRoller = lv_roller_create(activeScreen);	// Creates a roller object as a child of the activeScreen parent
 
 // When Center Button Pressed
 void on_center_button() {}
@@ -16,11 +18,10 @@ void initialize() {
 		&lv_font_montserrat_36, 
 		LV_PART_MAIN | LV_STATE_DEFAULT
 	);
-	lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());	// Creates activeScreen parent object
 	lv_obj_set_size(activeScreen, 470, 220);				// Configure size & position of activeScreen Parent
 	lv_obj_center(activeScreen);
 
-    lv_obj_t * autonRoller = lv_roller_create(activeScreen);// Creates a roller object as a child of the activeScreen parent
+
     lv_roller_set_options(									// Configure Roller
 		autonRoller, 
 		auton::autonNames.c_str(), 
@@ -39,10 +40,6 @@ void initialize() {
 	);
 	lv_obj_set_size(autonRoller, 470, 220);					// Configure size & position of roller object
 	lv_obj_center(autonRoller);
-
-	while (true) {
-		autonIndex = lv_roller_get_selected(autonRoller);
-	};
 }
 
 // When Disabled
@@ -53,7 +50,8 @@ void competition_initialize() {}
 
 // When Autonomous
 void autonomous() {
-//	if (autonIndex = #) {//auton code here};
+	autonIndex = lv_roller_get_selected(autonRoller);
+	if (autonIndex = 0) {};
 }
 
 // When Driver Control
