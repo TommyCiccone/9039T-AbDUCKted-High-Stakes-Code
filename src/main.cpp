@@ -1,3 +1,7 @@
+/* Upload Command:
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch yyyy-mm-dd-####"
+*/
+
 // Include Libraries
 #include "main.h"											// Include PROS Core Library
 #include "project/auton.hpp"								// Include Auton Header File
@@ -50,8 +54,8 @@ void competition_initialize() {}
 
 // When Autonomous
 void autonomous() {
-	autonIndex = lv_roller_get_selected(autonRoller);
-	if (autonIndex = 0) {};
+	autonIndex = lv_roller_get_selected(autonRoller);		// Sets autonIndex to index of currently selected roller item
+	if (autonIndex = 0) {};									// Runs auton routine if autonIndex = a number. (0 --> disabled)
 }
 
 // When Driver Control
