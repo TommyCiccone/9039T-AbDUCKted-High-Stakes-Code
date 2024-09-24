@@ -7,6 +7,13 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch yyyy-
 #include "project/auton.hpp"								// Include Auton Header File
 #include "liblvgl/lvgl.h"									// Include LVGL, a lightweight graphics library
 
+// Device Declarations
+pros::Controller master(pros::E_CONTROLLER_MASTER); 		// Creates Primary Controller
+pros::MotorGroup left_mg({-1, -3});							// Creates Left Motor Group with ports 1 & 2
+pros::MotorGroup right_mg({4, 5});  						// Creates Right Motor Group with ports 3 & 4
+pros::ADIDigitalOut clamp ('A');							// Initialize Goal Clamp Piston
+
+// UI Declarations
 int autonIndex = 0;											// Declares an int for storing the selected auton routine.
 lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());		// Creates activeScreen parent object
 lv_obj_t * autonRoller = lv_roller_create(activeScreen);	// Creates a roller object as a child of the activeScreen parent
@@ -60,12 +67,6 @@ void autonomous() {
 
 // When Driver Control
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER); 	// Creates Primary Controller
-	pros::MotorGroup left_mg({-1, -3});						// Creates Left Motor Group with ports 1 & 2
-	pros::MotorGroup right_mg({4, 5});  					// Creates Right Motor Group with ports 3 & 4
-	pros::ADIDigitalOut clamp ('A');						// Initialize Goal Clamp Piston
-
-
 	while (true) {
 		// Tank Drive Control Scheme
 		int left = master.get_analog(ANALOG_LEFT_Y);   	 	// Gets Left Stick Up/Down Value
