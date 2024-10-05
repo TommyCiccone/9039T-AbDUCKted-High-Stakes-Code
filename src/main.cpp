@@ -10,9 +10,9 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 // Device Declarations
 pros::Controller master(pros::E_CONTROLLER_MASTER); 		// Creates Primary Controller
 pros::MotorGroup left_mg({-1, -3, 4});							// Creates Left Drive Motor Group with ports 1 & 2
-pros::MotorGroup right_mg({4, 5, -7});  						// Creates Right Drive Motor Group with ports 3 & 4
-pros::Motor conveyor(9);									// Creates Intake Conveyor Motor with port 6
-pros::Motor intake(8);										// Creates Intake Front Motor with port 7 (half motor initalization is the same)
+pros::MotorGroup right_mg({5, 7, -8});  						// Creates Right Drive Motor Group with ports 3 & 4
+pros::Motor conveyor(10);									// Creates Intake Conveyor Motor with port 6
+pros::Motor intake(9);										// Creates Intake Front Motor with port 7 (half motor initalization is the same)
 pros::ADIDigitalOut clamp ('A');							// Initialize Goal Clamp Piston
 
 // UI Declarations
