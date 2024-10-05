@@ -9,10 +9,10 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 
 // Device Declarations
 pros::Controller master(pros::E_CONTROLLER_MASTER); 		// Creates Primary Controller
-pros::MotorGroup left_mg({-1, -3, 4});							// Creates Left Drive Motor Group with ports 1 & 2
-pros::MotorGroup right_mg({5, 7, -8});  						// Creates Right Drive Motor Group with ports 3 & 4
-pros::Motor conveyor(10);									// Creates Intake Conveyor Motor with port 6
-pros::Motor intake(9);										// Creates Intake Front Motor with port 7 (half motor initalization is the same)
+pros::MotorGroup left_mg({-1, -3, 4});						// Creates Left Drive Motor Group with ports 1, 3, & 4
+pros::MotorGroup right_mg({5, 7, -8});  					// Creates Right Drive Motor Group with ports 5, 7, & 8
+pros::Motor conveyor(10);									// Creates Intake Conveyor Motor with port 10
+pros::Motor intake(9);										// Creates Intake Front Motor with port 9 (half motor initalization is the same)
 pros::ADIDigitalOut clamp ('A');							// Initialize Goal Clamp Piston
 
 // UI Declarations
@@ -86,11 +86,11 @@ void opcontrol() {
 
 		// Intake  Motor Control
 		if (master.get_digital(DIGITAL_L1)) {				// Is Controller L1 Pressed?
-			conveyor.move(127);
+			conveyor.move(127);								// Spin Motors Forward
 			intake.move(127);
 		}
 		if (master.get_digital(DIGITAL_L2)) {				// Is controller L2 Pressed?
-			conveyor.move(127);
+			conveyor.move(127);								// Spin Motors Reverse
 			intake.move(127);
 		} 
 		if (!master.get_digital(DIGITAL_L1) && !master.get_digital(DIGITAL_L2)) {	// Otherwise
