@@ -4,5 +4,5 @@
 
 namespace auton {                                          // Creates "auton" namespace
     const std::string autonNames =                             // List of autons to be selected for display
-        "Disabled\nFiller Routine\n";                           
+        "Disabled\nRed 1\nRed 2\nBlue 1\nBlue 2";                           
 }
