@@ -3,6 +3,9 @@
 File Descriptions:
 
     firmware                  Folder containing Vex V5 brain firmware and related files, created automatically
+        lemlib.a                  Library for LemLib enabling easy PID, Odometry, and Autonomous
+
+        hot-cold-asset.mk         Parts of LemLib Library
 
         libc.a                    Linux library containing c/c++ libraries
     
@@ -19,8 +22,12 @@ File Descriptions:
         v5.ld                     V5 Firmware
     
     include                   Folder containing included libraries
+    
+        fmt                       Folder containing dependency libraries for LemLib, added by user
 
-        liblvgl                   Folder containing many graphics library, created automatically
+        lemlib                    Folder containing many LemLib libraries, added by user
+
+        liblvgl                   Folder containing many graphics libraries, created automatically
     
         pros                      Folder containing many PROS libraries, created automatically
 
@@ -35,6 +42,8 @@ File Descriptions:
     src                       Folder containing all C++ files
 
         main.cpp                  Main C++ file, only file that runs on startup, references all other files
+
+    static                    Folder for user-made Jerry-IO autonomous routines
     
     .DS_store                 Created and used by macOS, not relevant to code
 
