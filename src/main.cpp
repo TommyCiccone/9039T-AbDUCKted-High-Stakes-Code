@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-06-0002"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-09-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -110,12 +110,14 @@ void competition_initialize() {}
 
 // When Autonomous
 void autonomous() {
+	intake_mg.move_relative(-720, 127);
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
 	if (autonIndex = 0) {};											// Runs auton routine if autonIndex = a number. (0 --> disabled)
 	if (autonIndex = 1) {};											// Runs auton routine if autonIndex = a number. (1 --> red1)
 	if (autonIndex = 2) {};											// Runs auton routine if autonIndex = a number. (2 --> red2)
 	if (autonIndex = 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
-		chassis.setPose(-61, 12, 0);
+		chassis.setPose(-61, 12, 0);								// Set Starting Position
+		chassis.moveToPoint(-24, 24, 2000);							// Drive to Mobile Goal
 	};											
 	if (autonIndex = 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
 	if (autonIndex = 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
@@ -128,28 +130,34 @@ void opcontrol() {
 		// Tank Drive Control Scheme
 		int left = master.get_analog(ANALOG_LEFT_Y);   	 			// Gets Left Stick Up/Down Value
 		int right = master.get_analog(ANALOG_RIGHT_Y);  			// Gets Right Stick Up/Down Value
-		chassis.tank(left, right);
+		chassis.tank(left, right);									// Passes Stick Values into LemLib Chassis for Interpretation
 
 //		left_mg.move(left);		                  					// Sets Left Motor Group Speed
 //		right_mg.move(right);                     					// Sets Right Motor Group Speed
 
 		// Goal Clamp Piston Control
-		if (master.get_digital(DIGITAL_R1)) {						// Is Controller R1 Pressed?
+		if (master.get_digital(DIGITAL_L1)) {						// Is Controller R1 Pressed?
 			clamp.set_value(true);									// Set Solenoid to True
 		};
-		if (master.get_digital(DIGITAL_R2)) {						// Is Controller R2 Pressed?
+		if (master.get_digital(DIGITAL_L2)) {						// Is Controller R2 Pressed?
 			clamp.set_value(false);									// Set Solenoid to False
 		};
 
 		// Intake Motor Control - Toggle Mode
-		if (master.get_digital(DIGITAL_L1) && (!intakeMoving || intakeReverse)) {
+		if (master.get_digital(DIGITAL_R1) && (!intakeMoving || intakeReverse)) {			// If L1 & (Intake Stopped or Moving Reverse),
 			intake_mg.move(127);
-		} else if (master.get_digital(DIGITAL_L1) && intakeMoving && !intakeReverse) {
-			intake_mg.move(0);
-		} else if (master.get_digital(DIGITAL_L2) && (!intakeMoving || !intakeReverse)) {
+			intakeMoving = 1;
+			intakeReverse = 0;																// Move Intake Forward
+		} else if (master.get_digital(DIGITAL_R1) && intakeMoving && !intakeReverse) {		// If L1 & Intake Moving Forward,
+			intake_mg.move(0);	
+			intakeMoving = 0;																// Stop Intake
+		} else if (master.get_digital(DIGITAL_R2) && (!intakeMoving || !intakeReverse)) {	// If L2 & (Intake Stopped of Moving Forward),
 			intake_mg.move(-127);
-		} else if (master.get_digital(DIGITAL_L2) && intakeMoving && !intakeReverse) {
-			intake_mg.move(0);
+			intakeMoving = 1;
+			intakeReverse = 1;																// Move Intake Reverse
+		} else if (master.get_digital(DIGITAL_R2) && intakeMoving && !intakeReverse) {		// If L2 & Intake Moving Reverse,
+			intake_mg.move(0);	
+			intakeMoving = 0;																// Stop Intake
 		};
 		
 		// Intake Motor Control - Hold Mode (Old)
