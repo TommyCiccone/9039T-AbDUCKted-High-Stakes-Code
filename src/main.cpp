@@ -13,8 +13,9 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Controller
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports
 pros::MotorGroup right_mg({4, 5, -7}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports
-pros::MotorGroup intake_mg({8, 9});									// Creates Intake Motor Grouo with ports
+pros::MotorGroup intake_mg({8, 9});									// Creates Intake Motor Group with ports
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston
+pros::Imu inertial(10);
 
 // LemLib Declarations [From LemLib Template]
 // Declare Drivetrain
@@ -30,7 +31,7 @@ lemlib::OdomSensors sensors(nullptr, 								// vertical tracking wheel 1, set t
                             nullptr,								// vertical tracking wheel 2, set to null
                             nullptr, 								// horizontal tracking wheel 1, set to null
                             nullptr, 								// horizontal tracking wheel 2, set to null
-                            nullptr 								// inertial sensor, set to null
+                            &inertial 								// inertial sensor, set to null
 );
 // *PID is not used until we have an IMU and Odometry Set Up*, we just need these here to declare the chassis
 // Declare Lateral PID Controller
@@ -116,8 +117,10 @@ void autonomous() {
 	if (autonIndex = 1) {};											// Runs auton routine if autonIndex = a number. (1 --> red1)
 	if (autonIndex = 2) {};											// Runs auton routine if autonIndex = a number. (2 --> red2)
 	if (autonIndex = 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
-		chassis.setPose(-61, 12, 0);								// Set Starting Position
-		chassis.moveToPoint(-24, 24, 2000);							// Drive to Mobile Goal
+		clamp.set_value(false);
+		chassis.setPose(-58, 21, 90, false);						// Set Starting Position
+		chassis.moveToPoint(-32, 24, 1000);							// Drive to Mobile Goal
+		clamp.set_value(true);
 	};											
 	if (autonIndex = 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
 	if (autonIndex = 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
