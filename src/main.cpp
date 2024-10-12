@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-09-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-12-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -111,16 +111,17 @@ void competition_initialize() {}
 
 // When Autonomous
 void autonomous() {
-	intake_mg.move_relative(-720, 127);
+	intake_mg.move_relative(-720, 127);								// Spin intake reverse - release expansion mech
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
 	if (autonIndex = 0) {};											// Runs auton routine if autonIndex = a number. (0 --> disabled)
 	if (autonIndex = 1) {};											// Runs auton routine if autonIndex = a number. (1 --> red1)
 	if (autonIndex = 2) {};											// Runs auton routine if autonIndex = a number. (2 --> red2)
 	if (autonIndex = 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
-		clamp.set_value(false);
-		chassis.setPose(-58, 21, 90, false);						// Set Starting Position
-		chassis.moveToPoint(-32, 24, 1000);							// Drive to Mobile Goal
-		clamp.set_value(true);
+		clamp.set_value(false);											// Extend Clamp Piston
+		chassis.setPose(-58, 21, 90, false);							// Set Starting Position
+		chassis.moveToPoint(-32, 24, 1000);								// Drive to Mobile Goal, wait 1 sec
+		clamp.set_value(true);											// Retract Clamp Piston - clamp mogo
+		intake_mg.move_relative(1440, 127);								// Spin intake forward - drop ring onto mogo
 	};											
 	if (autonIndex = 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
 	if (autonIndex = 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
@@ -128,7 +129,7 @@ void autonomous() {
 
 // When Driver Control
 void opcontrol() {
-	bool intakeMoving = 0; bool intakeReverse = 0;
+//	bool intakeMoving = 0; bool intakeReverse = 0;
 	while (true) {
 		// Tank Drive Control Scheme
 		int left = master.get_analog(ANALOG_LEFT_Y);   	 			// Gets Left Stick Up/Down Value
@@ -147,32 +148,32 @@ void opcontrol() {
 		};
 
 		// Intake Motor Control - Toggle Mode
-		if (master.get_digital(DIGITAL_R1) && (!intakeMoving || intakeReverse)) {			// If L1 & (Intake Stopped or Moving Reverse),
-			intake_mg.move(127);
-			intakeMoving = 1;
-			intakeReverse = 0;																// Move Intake Forward
-		} else if (master.get_digital(DIGITAL_R1) && intakeMoving && !intakeReverse) {		// If L1 & Intake Moving Forward,
-			intake_mg.move(0);	
-			intakeMoving = 0;																// Stop Intake
-		} else if (master.get_digital(DIGITAL_R2) && (!intakeMoving || !intakeReverse)) {	// If L2 & (Intake Stopped of Moving Forward),
-			intake_mg.move(-127);
-			intakeMoving = 1;
-			intakeReverse = 1;																// Move Intake Reverse
-		} else if (master.get_digital(DIGITAL_R2) && intakeMoving && !intakeReverse) {		// If L2 & Intake Moving Reverse,
-			intake_mg.move(0);	
-			intakeMoving = 0;																// Stop Intake
-		};
+//		if (master.get_digital(DIGITAL_R1) && (!intakeMoving || intakeReverse)) {			// If L1 & (Intake Stopped or Moving Reverse),
+//			intake_mg.move(127);
+//			intakeMoving = 1;
+//			intakeReverse = 0;																// Move Intake Forward
+//		} else if (master.get_digital(DIGITAL_R1) && intakeMoving && !intakeReverse) {		// If L1 & Intake Moving Forward,
+//			intake_mg.move(0);	
+//			intakeMoving = 0;																// Stop Intake
+//		} else if (master.get_digital(DIGITAL_R2) && (!intakeMoving || !intakeReverse)) {	// If L2 & (Intake Stopped of Moving Forward),
+//			intake_mg.move(-127);
+//			intakeMoving = 1;
+//			intakeReverse = 1;																// Move Intake Reverse
+//		} else if (master.get_digital(DIGITAL_R2) && intakeMoving && !intakeReverse) {		// If L2 & Intake Moving Reverse,
+//			intake_mg.move(0);	
+//			intakeMoving = 0;																// Stop Intake
+//		};
 		
 		// Intake Motor Control - Hold Mode (Old)
-//		if (master.get_digital(DIGITAL_L1)) {						// Is Controller L1 Pressed?
-//			intake_mg.move(127);									// Spin Motors Forward
-//		};
-//		if (master.get_digital(DIGITAL_L2)) {						// Is controller L2 Pressed?
-//			intake_mg.move(-127);									// Spin Motors Reverse
-//		}; 
-//		if (!master.get_digital(DIGITAL_L1) && !master.get_digital(DIGITAL_L2)) {	// Otherwise
-//			intake_mg.move(0);										// Stop Motors
-//		};
+		if (master.get_digital(DIGITAL_R1)) {						// Is Controller L1 Pressed?
+			intake_mg.move(127);									// Spin Motors Forward
+		};
+		if (master.get_digital(DIGITAL_R2)) {						// Is controller L2 Pressed?
+			intake_mg.move(-127);									// Spin Motors Reverse
+		}; 
+		if (!master.get_digital(DIGITAL_R1) && !master.get_digital(DIGITAL_R2)) {	// Otherwise
+			intake_mg.move(0);										// Stop Motors
+		};
 
 		pros::delay(10);                               				// Wait 10ms
 	};
