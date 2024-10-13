@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-12-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-13-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -74,6 +74,7 @@ void on_center_button() {}
 // When Start
 void initialize() {
 	chassis.calibrate();
+	pros::delay(2000);
 
 // All code here will be moved to "void competition_initialize() later. at the time of testing I don't have a comp switch."
 	lv_obj_set_style_text_font(										// Set font size to 36 pt.
@@ -107,24 +108,23 @@ void initialize() {
 void disabled() {}
 
 // When Connect to Field Control
-void competition_initialize() {}
+void competition_initialize() {
+}
 
 // When Autonomous
 void autonomous() {
-	intake_mg.move_relative(-720, 127);								// Spin intake reverse - release expansion mech
-	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
-	if (autonIndex = 0) {};											// Runs auton routine if autonIndex = a number. (0 --> disabled)
-	if (autonIndex = 1) {};											// Runs auton routine if autonIndex = a number. (1 --> red1)
-	if (autonIndex = 2) {};											// Runs auton routine if autonIndex = a number. (2 --> red2)
-	if (autonIndex = 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
-		clamp.set_value(false);											// Extend Clamp Piston
-		chassis.setPose(-58, 21, 90, false);							// Set Starting Position
-		chassis.moveToPoint(-32, 24, 1000);								// Drive to Mobile Goal, wait 1 sec
-		clamp.set_value(true);											// Retract Clamp Piston - clamp mogo
-		intake_mg.move_relative(1440, 127);								// Spin intake forward - drop ring onto mogo
-	};											
-	if (autonIndex = 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
-	if (autonIndex = 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
+	intake_mg.move_relative(-720, 127);
+//	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
+	pros::delay(1200);
+//	if (autonIndex = 0) {};											// Runs auton routine if autonIndex = a number. (0 --> disabled)
+//	if (autonIndex = 1) {};											// Runs auton routine if autonIndex = a number. (1 --> red1)
+//	if (autonIndex = 2) {};											// Runs auton routine if autonIndex = a number. (2 --> red2)
+//	if (autonIndex = 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
+		chassis.setPose(-58, 21, 90, false);						// Set Starting Position
+		chassis.moveToPoint(-32, 24, 1000);							// Drive to Mobile Goal
+//	};											
+//	if (autonIndex = 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
+//	if (autonIndex = 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
 }
 
 // When Driver Control
