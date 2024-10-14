@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-13-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-13-0002"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -58,7 +58,7 @@ lemlib::ControllerSettings angular_controller(2, 					// proportional gain (kP)
 );
 // Declare Chassis
 lemlib::Chassis chassis(drivetrain, 								// drivetrain settings
-                        lateral_controller, 						// lateral PID settings
+                  lateral_controller, 						// lateral PID settings
                         angular_controller,				 			// angular PID settings
                         sensors 									// odometry sensors
 );
@@ -73,8 +73,12 @@ void on_center_button() {}
 
 // When Start
 void initialize() {
+	inertial.reset();												// Calib
+	pros::delay(3000);
 	chassis.calibrate();
-	pros::delay(2000);
+	pros::delay(3000);
+
+	master.rumble("---");
 
 // All code here will be moved to "void competition_initialize() later. at the time of testing I don't have a comp switch."
 	lv_obj_set_style_text_font(										// Set font size to 36 pt.
@@ -114,30 +118,39 @@ void competition_initialize() {
 // When Autonomous
 void autonomous() {
 	intake_mg.move_relative(-720, 127);
-//	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
-	pros::delay(1200);
-//	if (autonIndex = 0) {};											// Runs auton routine if autonIndex = a number. (0 --> disabled)
-//	if (autonIndex = 1) {};											// Runs auton routine if autonIndex = a number. (1 --> red1)
-//	if (autonIndex = 2) {};											// Runs auton routine if autonIndex = a number. (2 --> red2)
-//	if (autonIndex = 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
-		chassis.setPose(-58, 21, 90, false);						// Set Starting Position
-		chassis.moveToPoint(-32, 24, 1000);							// Drive to Mobile Goal
-//	};											
-//	if (autonIndex = 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
-//	if (autonIndex = 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
+	master.rumble(".");
+	chassis.setPose(0, 0, 0);
+//	chassis.setPose(-58, 24, -90);
+	master.rumble("-");
+	chassis.moveToPoint(0, 24, 10000);
+//	chassis.moveToPoint(-32, 24, 10000);
+	master.rumble(".-");
 }
+
+/*
+// When Autonomous
+void autonomous() {
+	intake_mg.move_relative(-720, 127);
+	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
+	if (autonIndex == 0) {};											// Runs auton routine if autonIndex = a number. (0 --> disabled)
+	if (autonIndex == 1) {};											// Runs auton routine if autonIndex = a number. (1 --> red1)
+	if (autonIndex == 2) {};											// Runs auton routine if autonIndex = a number. (2 --> red2)
+	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
+		chassis.setPose(-58, 24, -90);								// Set Starting Position
+		chassis.moveToPoint(-32, 24, 10000);
+	};											
+	if (autonIndex == 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
+	if (autonIndex == 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
+}
+*/
 
 // When Driver Control
 void opcontrol() {
-//	bool intakeMoving = 0; bool intakeReverse = 0;
 	while (true) {
 		// Tank Drive Control Scheme
 		int left = master.get_analog(ANALOG_LEFT_Y);   	 			// Gets Left Stick Up/Down Value
 		int right = master.get_analog(ANALOG_RIGHT_Y);  			// Gets Right Stick Up/Down Value
 		chassis.tank(left, right);									// Passes Stick Values into LemLib Chassis for Interpretation
-
-//		left_mg.move(left);		                  					// Sets Left Motor Group Speed
-//		right_mg.move(right);                     					// Sets Right Motor Group Speed
 
 		// Goal Clamp Piston Control
 		if (master.get_digital(DIGITAL_L1)) {						// Is Controller R1 Pressed?
@@ -146,25 +159,8 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_L2)) {						// Is Controller R2 Pressed?
 			clamp.set_value(false);									// Set Solenoid to False
 		};
-
-		// Intake Motor Control - Toggle Mode
-//		if (master.get_digital(DIGITAL_R1) && (!intakeMoving || intakeReverse)) {			// If L1 & (Intake Stopped or Moving Reverse),
-//			intake_mg.move(127);
-//			intakeMoving = 1;
-//			intakeReverse = 0;																// Move Intake Forward
-//		} else if (master.get_digital(DIGITAL_R1) && intakeMoving && !intakeReverse) {		// If L1 & Intake Moving Forward,
-//			intake_mg.move(0);	
-//			intakeMoving = 0;																// Stop Intake
-//		} else if (master.get_digital(DIGITAL_R2) && (!intakeMoving || !intakeReverse)) {	// If L2 & (Intake Stopped of Moving Forward),
-//			intake_mg.move(-127);
-//			intakeMoving = 1;
-//			intakeReverse = 1;																// Move Intake Reverse
-//		} else if (master.get_digital(DIGITAL_R2) && intakeMoving && !intakeReverse) {		// If L2 & Intake Moving Reverse,
-//			intake_mg.move(0);	
-//			intakeMoving = 0;																// Stop Intake
-//		};
 		
-		// Intake Motor Control - Hold Mode (Old)
+		// Intake Motor Control - Hold Mode
 		if (master.get_digital(DIGITAL_R1)) {						// Is Controller L1 Pressed?
 			intake_mg.move(127);									// Spin Motors Forward
 		};
