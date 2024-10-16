@@ -119,6 +119,7 @@ void competition_initialize() {
 void autonomous() {
 	intake_mg.move_relative(-720, 127);
 	master.rumble(".");
+	
 	chassis.setPose(0, 0, 0);
 //	chassis.setPose(-58, 24, -90);
 	master.rumble("-");
