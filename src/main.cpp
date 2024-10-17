@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-13-0002"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-16-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -73,11 +73,7 @@ void on_center_button() {}
 
 // When Start
 void initialize() {
-	inertial.reset();												// Calib
-	pros::delay(3000);
 	chassis.calibrate();
-	pros::delay(3000);
-
 	master.rumble("---");
 
 // All code here will be moved to "void competition_initialize() later. at the time of testing I don't have a comp switch."
@@ -118,32 +114,25 @@ void competition_initialize() {
 // When Autonomous
 void autonomous() {
 	intake_mg.move_relative(-720, 127);
-	master.rumble(".");
-	
-	chassis.setPose(0, 0, 0);
-//	chassis.setPose(-58, 24, -90);
-	master.rumble("-");
-	chassis.moveToPoint(0, 24, 10000);
-//	chassis.moveToPoint(-32, 24, 10000);
-	master.rumble(".-");
-}
-
-/*
-// When Autonomous
-void autonomous() {
-	intake_mg.move_relative(-720, 127);
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
-	if (autonIndex == 0) {};											// Runs auton routine if autonIndex = a number. (0 --> disabled)
-	if (autonIndex == 1) {};											// Runs auton routine if autonIndex = a number. (1 --> red1)
-	if (autonIndex == 2) {};											// Runs auton routine if autonIndex = a number. (2 --> red2)
+	if (autonIndex == 0) {};										// Runs auton routine if autonIndex = a number. (0 --> disabled)
+	if (autonIndex == 1) {};										// Runs auton routine if autonIndex = a number. (1 --> red1)
+	if (autonIndex == 2) {};										// Runs auton routine if autonIndex = a number. (2 --> red2)
 	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
-		chassis.setPose(-58, 24, -90);								// Set Starting Position
-		chassis.moveToPoint(-32, 24, 10000);
+		clamp.set_value(true);											// Extended Clamp
+		chassis.setPose(58, -24, 270);									// Set Starting Position
+		chassis.turnToHeading(297.5, 2000);								// Turn
+		chassis.moveToPoint(37, -14, 5000);								// Drive partway to goal
+		chassis.turnToHeading(232, 2000);								// Turn to face goal
+		chassis.moveToPoint(24, -24, 50000);							// Drive to goal
+		pros::delay(1000);												// wait
+		clamp.set_value(false);											// Clamp Goal (retract clamp)
+		intake_mg.move_relative(1440, 127);
 	};											
 	if (autonIndex == 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
 	if (autonIndex == 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
 }
-*/
+
 
 // When Driver Control
 void opcontrol() {
