@@ -13,7 +13,7 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Controller
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports
 pros::MotorGroup right_mg({4, 5, -7}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports
-pros::MotorGroup intake_mg({8, 9});									// Creates Intake Motor Group with ports
+pros::MotorGroup intake_mg({8, 6});									// Creates Intake Motor Group with ports
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston
 pros::Imu inertial(10);
 
@@ -68,9 +68,6 @@ int autonIndex = 0;													// Declares an int for storing the selected auto
 lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());				// Creates activeScreen parent object
 lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent
 
-// When Center Button Pressed
-void on_center_button() {}
-
 // When Start
 void initialize() {
 	chassis.calibrate();
@@ -108,8 +105,7 @@ void initialize() {
 void disabled() {}
 
 // When Connect to Field Control
-void competition_initialize() {
-}
+void competition_initialize() {}
 
 // When Autonomous
 void autonomous() {
@@ -122,15 +118,27 @@ void autonomous() {
 		clamp.set_value(true);											// Extended Clamp
 		chassis.setPose(58, -24, 270);									// Set Starting Position
 		chassis.turnToHeading(297.5, 2000);								// Turn
-		chassis.moveToPoint(37, -14, 5000);								// Drive partway to goal
-		chassis.turnToHeading(232, 2000);								// Turn to face goal
-		chassis.moveToPoint(24, -24, 50000);							// Drive to goal
-		pros::delay(1000);												// wait
+		chassis.moveToPoint(37, -14, 5000);								// Drive Part Way to Goal
+		chassis.turnToHeading(232, 2000);								// Turn to Face Goal
+		chassis.moveToPoint(24, -24, 5000);								// Drive to Goal 
+		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
-		intake_mg.move_relative(1440, 127);
+		intake_mg.move_relative(1440, 127);								// Deposit Preload Ring onto Goal
+		pros::delay(2000);												// Wait
+		chassis.turnToHeading(180, 2000);
+		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
+		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
+		pros::delay(2000);												// Wait
+		intake_mg.move(127);											// Intake Bottom Ring of Stack, Load onto MoGo
+		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
+		pros::delay(10000);												// Wait
+		intake_mg.move(0);												// Stop Intake
 	};											
 	if (autonIndex == 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
-	if (autonIndex == 5) {};											// Runs auton routine if autonIndex = a number. (5 --> clearLine)
+	if (autonIndex == 5) {												// Runs auton routine if autonIndex = a number. (5 --> clearLine)
+		chassis.setPose(0, 0, 0);
+		chassis.moveToPoint(0, 24, 5000);
+	};											
 }
 
 
