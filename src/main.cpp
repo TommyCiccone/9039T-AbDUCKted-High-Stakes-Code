@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-16-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-10-20-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -116,13 +116,14 @@ void autonomous() {
 	if (autonIndex == 2) {};										// Runs auton routine if autonIndex = a number. (2 --> red2)
 	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
 		clamp.set_value(true);											// Extended Clamp
-		chassis.setPose(58, -24, 270);									// Set Starting Position
+		chassis.setPose(60, -24, 270);									// Set Starting Position
 		chassis.turnToHeading(297.5, 2000);								// Turn
-		chassis.moveToPoint(37, -14, 5000);								// Drive Part Way to Goal
-		chassis.turnToHeading(232, 2000);								// Turn to Face Goal
+		chassis.moveToPoint(38.25, -15, 5000);							// Drive Part Way to Goal
+		chassis.turnToHeading(237, 2000);								// Turn to Face Goal
 		chassis.moveToPoint(24, -24, 5000);								// Drive to Goal 
 		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
+		pros::delay(500);
 		intake_mg.move_relative(1440, 127);								// Deposit Preload Ring onto Goal
 		pros::delay(2000);												// Wait
 		chassis.turnToHeading(180, 2000);
@@ -134,11 +135,35 @@ void autonomous() {
 		pros::delay(10000);												// Wait
 		intake_mg.move(0);												// Stop Intake
 	};											
-	if (autonIndex == 4) {};											// Runs auton routine if autonIndex = a number. (4 --> blue2)
+	if (autonIndex == 4) {												
+		clamp.set_value(true);
+		chassis.setPose(58, 24, 270);
+		chassis.turnToHeading(242.5, 2000);
+		chassis.moveToPoint(38.25, 15, 5000);
+		chassis.turnToHeading(303, 2000);
+		chassis.moveToPoint(24, 24, 5000);
+		pros::delay(1000);
+		clamp.set_value(false);
+		pros::delay(500);
+		intake_mg.move_relative(1440, 127);
+		pros::delay(2000);
+		chassis.turnToHeading(0, 2000);
+		chassis.turnToHeading(180, 2000);
+		chassis.moveToPoint(24, 46, 5000, {.forwards = false});
+		pros::delay(2000);
+		intake_mg.move(127);
+		chassis.moveToPoint(24, 54, 5000, {.forwards = false});
+		pros::delay(10000);
+		intake_mg.move(0);
+	};											
 	if (autonIndex == 5) {												// Runs auton routine if autonIndex = a number. (5 --> clearLine)
 		chassis.setPose(0, 0, 0);
 		chassis.moveToPoint(0, 24, 5000);
-	};											
+	};									
+	if (autonIndex == 6) {												// Runs auton routine if autonIndex = a number. (6 --> pidtest)
+		chassis.setPose (0, 0, 0);
+		chassis.turnToHeading (90, 100000);
+	}		
 }
 
 
