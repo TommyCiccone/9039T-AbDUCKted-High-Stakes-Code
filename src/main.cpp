@@ -47,7 +47,7 @@ lemlib::ControllerSettings lateral_controller(10, 					// proportional gain (kP)
 );
 // Declare Angular PID Controller
 lemlib::ControllerSettings angular_controller(2, 					// proportional gain (kP)
-                                              0, 					// integral gain (kI)
+                                              1, 					// integral gain (kI)
                                               10, 					// derivative gain (kD)
                                               3, 					// anti windup
                                               1, 					// small error range, in degrees
@@ -162,7 +162,11 @@ void autonomous() {
 	};									
 	if (autonIndex == 6) {												// Runs auton routine if autonIndex = a number. (6 --> pidtest)
 		chassis.setPose (0, 0, 0);
-		chassis.turnToHeading (90, 100000);
+		chassis.moveToPoint (0, 48, 10000);
+		chassis.turnToHeading (90, 10000);
+		pros::delay(2500);
+		chassis.turnToHeading (0, 10000);
+		chassis.moveToPoint (0, 0, 10000, {.forwards = false});
 	}		
 }
 
