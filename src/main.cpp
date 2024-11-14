@@ -140,6 +140,35 @@ void autonomous() {
 		chassis.setPose(0, 0, 0);
 		chassis.moveToPoint(0, 24, 5000);
 	};											
+	if (autonIndex == 6) {												// Runs auton routine if autonIndex = a number. (5 --> skillsAuton)
+		intake_mg.move(127);
+		chassis.setPose(-58, -30, 58);
+		pros::delay(2000);
+		clamp.set_value(true);
+		pros::delay(2000);
+		chassis.moveToPoint(-48, -24, 5000);
+		pros::delay(2000);
+		clamp.set_value(false);
+		pros::delay(2000);
+		chassis.turnToHeading(-90, 2000);
+		chassis.moveToPoint(-24, -24, 2000, {.forwards = false});
+		pros::delay(2000);
+		chassis.turnToHeading(0, 2000);
+		chassis.moveToPoint(-24, -48, 3000, {.forwards = false});
+		pros::delay(2000);
+		chassis.turnToHeading(90, 2000);
+		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});
+		pros::delay(2000);
+		chassis.moveToPoint(-60, -48, 3000, {.forwards = false});
+		pros::delay(2000);
+		chassis.turnToHeading(315, 2000);
+		chassis.moveToPoint(-48, -58, 3000, {.forwards = false});
+		pros::delay(2000);
+		chassis.turnToHeading(270, 2000);
+		chassis.moveToPoint(-60, -60, 3000, {.forwards = false});
+		pros::delay(2000);
+		intake_mg.move(0);
+	};
 }
 
 
