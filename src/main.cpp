@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-11-13-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-11-20-0002"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -140,7 +140,7 @@ void autonomous() {
 		chassis.turnToHeading(242.5, 2000);
 		chassis.moveToPoint(38.25, 15, 5000);
 		chassis.turnToHeading(303, 2000);
-		chassis.moveToPoint(24, 24, 5000);
+		chassis.moveToPoint(24, 24, 8000, {.maxSpeed = 100});
 		pros::delay(1000);
 		clamp.set_value(false);
 		pros::delay(500);
