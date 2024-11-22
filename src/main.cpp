@@ -135,25 +135,25 @@ void autonomous() {
 		intake_mg.move(0);												// Stop Intake
 	};											
 	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (4 --> blue2)
-		clamp.set_value(true);
-		chassis.setPose(60, 24, 270);
-		chassis.turnToHeading(242.5, 2000);
-		chassis.moveToPoint(38.25, 15, 5000);
-		chassis.turnToHeading(303, 2000);
-		chassis.moveToPoint(24, 24, 8000, {.maxSpeed = 100});
-		pros::delay(1000);
-		clamp.set_value(false);
+		clamp.set_value(true);											// Extend Clamp
+		chassis.setPose(60, 24, 270);									// Set Start Position
+		chassis.turnToHeading(242.5, 2000);								// Turn
+		chassis.moveToPoint(38.25, 15, 5000);							// Drive part way to goal
+		chassis.turnToHeading(303, 2000);								// Turn to face goal
+		chassis.moveToPoint(24, 24, 8000, {.maxSpeed = 100});			// Slowly approach goal, to avoid pushing it away
+		pros::delay(1000);												// Wait
+		clamp.set_value(false);											// Clamp Goal
 		pros::delay(500);
-		intake_mg.move_relative(1440, 127);
-		pros::delay(2000);
-		chassis.turnToHeading(0, 2000);
-		chassis.turnToHeading(180, 2000);
-		chassis.moveToPoint(24, 46, 5000, {.forwards = false});
-		pros::delay(2000);
-		intake_mg.move(127);
-		chassis.moveToPoint(24, 54, 5000, {.forwards = false});
-		pros::delay(10000);
-		intake_mg.move(0);
+		intake_mg.move_relative(1440, 127);								// Deposit Preload ring onto goal
+		pros::delay(2000);												// Wait
+		chassis.turnToHeading(0, 2000);									
+		chassis.turnToHeading(180, 2000);								// Turn to face ring stack North of goal
+		chassis.moveToPoint(24, 46, 5000, {.forwards = false});			// Drive to ring stack
+		pros::delay(2000);												// Wait
+		intake_mg.move(127);											// Intake and deposit rings
+		chassis.moveToPoint(24, 54, 5000, {.forwards = false});			// Drive reverse to assist intake
+		pros::delay(10000);												// Wait
+		intake_mg.move(0);												// Stop
 	};											
 	if (autonIndex == 5) {												// Runs auton routine if autonIndex = a number. (5 --> clearLine)
 		chassis.setPose(0, 0, 0);
