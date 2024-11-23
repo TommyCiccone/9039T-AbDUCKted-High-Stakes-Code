@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-11-20-0002"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-23-23-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -54,11 +54,11 @@ lemlib::ControllerSettings angular_controller(2, 					// proportional gain (kP)
                                               100, 					// small error range timeout, in milliseconds
                                               3, 					// large error range, in degrees
                                               500, 					// large error range timeout, in milliseconds
-                                              0 					// maximum acceleration (slew)
+                                              84 					// maximum acceleration (slew)
 );
 // Declare Chassis
 lemlib::Chassis chassis(drivetrain, 								// drivetrain settings
-                  lateral_controller, 						// lateral PID settings
+                        lateral_controller, 						// lateral PID settings
                         angular_controller,				 			// angular PID settings
                         sensors 									// odometry sensors
 );
@@ -70,6 +70,7 @@ lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller o
 
 // When Start
 void initialize() {
+	inertial.reset();
 	chassis.calibrate();
 	master.rumble("---");
 
@@ -140,7 +141,7 @@ void autonomous() {
 		chassis.turnToHeading(242.5, 2000);								// Turn
 		chassis.moveToPoint(38.25, 15, 5000);							// Drive part way to goal
 		chassis.turnToHeading(303, 2000);								// Turn to face goal
-		chassis.moveToPoint(24, 24, 8000, {.maxSpeed = 100});			// Slowly approach goal, to avoid pushing it away
+		chassis.moveToPoint(24, 24, 8000);								// Slowly approach goal, to avoid pushing it away
 		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal
 		pros::delay(500);
