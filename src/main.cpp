@@ -24,7 +24,7 @@ lemlib::Drivetrain drivetrain(&left_mg, 							// left motor group
                               12.625, 								// 12.625 inch track width
                               lemlib::Omniwheel::NEW_325, 			// using new 3.25" omnis
                               450,						 			// drivetrain rpm is 450
-                              2 									// horizontal drift is 2 (for now)
+                              2 									// horizontal drift is 2 
 );
 // Declare Sensors
 lemlib::OdomSensors sensors(nullptr, 								// vertical tracking wheel 1, set to null
@@ -185,7 +185,7 @@ void autonomous() {
 		chassis.moveToPoint(-48, -58, 3000, {.forwards = false});
 		pros::delay(2000);
 		chassis.turnToHeading(270, 2000);
-		chassis.moveToPoint(-60, -60, 3000, {.forwards = false});
+		chassis.moveToPoint(-60, -60, 3000);
 		pros::delay(2000);
 		chassis.turnToHeading(225, 2000);
 		pros::delay(2000);
