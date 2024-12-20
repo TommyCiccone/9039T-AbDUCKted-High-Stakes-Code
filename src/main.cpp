@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-23-23-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-12-19-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -112,9 +112,39 @@ void competition_initialize() {}
 void autonomous() {
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
 	if (autonIndex == 0) {};										// Runs auton routine if autonIndex = a number. (0 --> disabled)
-	if (autonIndex == 1) {};										// Runs auton routine if autonIndex = a number. (1 --> red1)
-	if (autonIndex == 2) {};										// Runs auton routine if autonIndex = a number. (2 --> red2)
-	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> blue1)
+	if (autonIndex == 1) {											// Runs auton routine if autonIndex = a number. (1 --> sugar1)
+		clamp.set_value(true);											// Extended Clamp
+		chassis.setPose(60, -24, 270);									// Set Starting Position
+		chassis.moveToPoint(24, -24, 5000);								// Drive to Goal 
+		pros::delay(500);												// Wait
+		clamp.set_value(false);											// Clamp Goal (retract clamp)
+		pros::delay(500);
+		intake_mg.move(127);								// Deposit Preload Ring onto Goal
+		pros::delay(750);												// Wait
+		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
+		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
+		pros::delay(1250);												// Wait
+		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
+		pros::delay(5000);												// Wait
+		intake_mg.move(0);												// Stop Intake
+	};										
+	if (autonIndex == 2) {											// Runs auton routine if autonIndex = a number. (2 --> sugar2)
+		clamp.set_value(true);											// Extend Clamp
+		chassis.setPose(60, 24, 270);									// Turn to face goal
+		chassis.moveToPoint(24, 24, 8000);								// Slowly approach goal, to avoid pushing it away
+		pros::delay(500);												// Wait
+		clamp.set_value(false);											// Clamp Goal
+		pros::delay(500);
+		intake_mg.move(127);											// Deposit Preload ring onto goal
+		pros::delay(750);												// Wait
+		chassis.turnToHeading(180, 2000);								// Turn to face ring stack North of goal
+		chassis.moveToPoint(24, 46, 5000, {.forwards = false});			// Drive to ring stack
+		pros::delay(1250);												// Wait
+		chassis.moveToPoint(24, 54, 5000, {.forwards = false});			// Drive reverse to assist intake
+		pros::delay(500);												// Wait
+		intake_mg.move(0);												// Stop
+	};										
+	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> old1)
 		clamp.set_value(true);											// Extended Clamp
 		chassis.setPose(60, -24, 270);									// Set Starting Position
 		chassis.turnToHeading(297.5, 2000);								// Turn
@@ -135,7 +165,7 @@ void autonomous() {
 		pros::delay(10000);												// Wait
 		intake_mg.move(0);												// Stop Intake
 	};											
-	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (4 --> blue2)
+	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (4 --> old2)
 		clamp.set_value(true);											// Extend Clamp
 		chassis.setPose(60, 24, 270);									// Set Start Position
 		chassis.turnToHeading(242.5, 2000);								// Turn
@@ -185,7 +215,7 @@ void autonomous() {
 		chassis.moveToPoint(-48, -58, 3000, {.forwards = false});
 		pros::delay(2000);
 		chassis.turnToHeading(270, 2000);
-		chassis.moveToPoint(-60, -60, 3000);
+		chassis.moveToPoint(-62, -62, 3000);
 		pros::delay(2000);
 		chassis.turnToHeading(225, 2000);
 		pros::delay(2000);
