@@ -119,7 +119,7 @@ void autonomous() {
 		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
 		pros::delay(500);
-		intake_mg.move(127);								// Deposit Preload Ring onto Goal
+		intake_mg.move(127);											// Deposit Preload Ring onto Goal
 		pros::delay(750);												// Wait
 		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
 		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
@@ -131,7 +131,7 @@ void autonomous() {
 	if (autonIndex == 2) {											// Runs auton routine if autonIndex = a number. (2 --> sugar2)
 		clamp.set_value(true);											// Extend Clamp
 		chassis.setPose(60, 24, 270);									// Turn to face goal
-		chassis.moveToPoint(24, 24, 8000);								// Slowly approach goal, to avoid pushing it away
+		chassis.moveToPoint(24, 24, 5000, {.maxSpeed = 84});			// Slowly approach goal, to avoid pushing it away
 		pros::delay(500);												// Wait
 		clamp.set_value(false);											// Clamp Goal
 		pros::delay(500);
