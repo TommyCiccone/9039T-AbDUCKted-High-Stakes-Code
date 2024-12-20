@@ -115,8 +115,8 @@ void autonomous() {
 	if (autonIndex == 1) {											// Runs auton routine if autonIndex = a number. (1 --> sugar1)
 		clamp.set_value(true);											// Extended Clamp
 		chassis.setPose(60, -24, 270);									// Set Starting Position
-		chassis.moveToPoint(24, -24, 5000);								// Drive to Goal 
-		pros::delay(500);												// Wait
+		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
+		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
 		pros::delay(500);
 		intake_mg.move(127);								// Deposit Preload Ring onto Goal
