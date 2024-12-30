@@ -121,7 +121,7 @@ void autonomous() {
 		pros::delay(500);
 		intake_mg.move(127);											// Deposit Preload Ring onto Goal
 		pros::delay(750);												// Wait
-		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
+		chassis.turnToHeading(1800, 2000);									// Turn to Face Ring Stack South of Goal
 		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
 		pros::delay(1250);												// Wait
 		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
