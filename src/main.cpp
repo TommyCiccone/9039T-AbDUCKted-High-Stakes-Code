@@ -11,11 +11,11 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 
 // Device Declarations
 pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Controller
-pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports
-pros::MotorGroup right_mg({4, 5, -7}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports
-pros::MotorGroup intake_mg({8, 6});									// Creates Intake Motor Group with ports
-pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston
-pros::Imu inertial(10);
+pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports 1, 2, 3
+pros::MotorGroup right_mg({4, 5, -7}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 7
+pros::MotorGroup intake_mg({8, 6});									// Creates Intake Motor Group with ports 6, 8
+pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
+pros::Imu inertial(10);												// Initialize Inertial Sensor on port 10					
 
 // LemLib Declarations [From LemLib Template]
 // Declare Drivetrain
@@ -33,7 +33,6 @@ lemlib::OdomSensors sensors(nullptr, 								// vertical tracking wheel 1, set t
                             nullptr, 								// horizontal tracking wheel 2, set to null
                             &inertial 								// inertial sensor, set to null
 );
-// *PID is not used until we have an IMU and Odometry Set Up*, we just need these here to declare the chassis
 // Declare Lateral PID Controller
 lemlib::ControllerSettings lateral_controller(10, 					// proportional gain (kP)
                                               0, 					// integral gain (kI)
@@ -72,7 +71,8 @@ lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller o
 void initialize() {
 	inertial.reset();
 	chassis.calibrate();
-	master.rumble("---");
+	master.rumble("-.. ..- -.-. -.-");								// Rumble Controller to Indicate Calibration Complete
+																	// Morse code for duck as an easter egg.
 
 // All code here will be moved to "void competition_initialize() later. at the time of testing I don't have a comp switch."
 	lv_obj_set_style_text_font(										// Set font size to 36 pt.
@@ -113,15 +113,15 @@ void autonomous() {
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
 	if (autonIndex == 0) {};										// Runs auton routine if autonIndex = a number. (0 --> disabled)
 	if (autonIndex == 1) {											// Runs auton routine if autonIndex = a number. (1 --> sugar1)
-		clamp.set_value(true);											// Extended Clamp
 		chassis.setPose(60, -24, 270);									// Set Starting Position
+		clamp.set_value(true);											// Extended Clamp
 		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
 		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
-		pros::delay(500);
+		pros::delay(500);												// Wait
 		intake_mg.move(127);											// Deposit Preload Ring onto Goal
 		pros::delay(750);												// Wait
-		chassis.turnToHeading(1800, 2000);									// Turn to Face Ring Stack South of Goal
+		chassis.turnToHeading(180, 2000);								// Turn to Face Ring Stack South of Goal
 		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
 		pros::delay(1250);												// Wait
 		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
@@ -129,8 +129,8 @@ void autonomous() {
 		intake_mg.move(0);												// Stop Intake
 	};										
 	if (autonIndex == 2) {											// Runs auton routine if autonIndex = a number. (2 --> sugar2)
-		clamp.set_value(true);											// Extend Clamp
 		chassis.setPose(60, 24, 270);									// Turn to face goal
+		clamp.set_value(true);											// Extend Clamp
 		chassis.moveToPoint(24, 24, 5000, {.maxSpeed = 84});			// Slowly approach goal, to avoid pushing it away
 		pros::delay(500);												// Wait
 		clamp.set_value(false);											// Clamp Goal
@@ -141,13 +141,16 @@ void autonomous() {
 		chassis.moveToPoint(24, 46, 5000, {.forwards = false});			// Drive to ring stack
 		pros::delay(1250);												// Wait
 		chassis.moveToPoint(24, 54, 5000, {.forwards = false});			// Drive reverse to assist intake
-		pros::delay(500);												// Wait
+		pros::delay(5000);												// Wait
 		intake_mg.move(0);												// Stop
-	};										
-	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> old1)
+	};
+	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> ally1)
+	};	
+	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (4 --> ally2)
+	};
+	if (autonIndex == 5) {											// Runs auton routine if autonIndex = a number. (5 --> old1)
 		clamp.set_value(true);											// Extended Clamp
 		chassis.setPose(60, -24, 270);									// Set Starting Position
-		chassis.turnToHeading(297.5, 2000);								// Turn
 		chassis.moveToPoint(38.25, -15, 5000);							// Drive Part Way to Goal
 		chassis.turnToHeading(237, 2000);								// Turn to Face Goal
 		chassis.moveToPoint(24, -24, 5000);								// Drive to Goal 
@@ -165,7 +168,7 @@ void autonomous() {
 		pros::delay(10000);												// Wait
 		intake_mg.move(0);												// Stop Intake
 	};											
-	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (4 --> old2)
+	if (autonIndex == 6) {											// Runs auton routine if autonIndex = a number. (6 --> old2)
 		clamp.set_value(true);											// Extend Clamp
 		chassis.setPose(60, 24, 270);									// Set Start Position
 		chassis.turnToHeading(242.5, 2000);								// Turn
@@ -186,20 +189,19 @@ void autonomous() {
 		pros::delay(10000);												// Wait
 		intake_mg.move(0);												// Stop
 	};											
-	if (autonIndex == 5) {												// Runs auton routine if autonIndex = a number. (5 --> clearLine)
+	if (autonIndex == 7) {												// Runs auton routine if autonIndex = a number. (7 --> clearLine)
 		chassis.setPose(0, 0, 0);
 		chassis.moveToPoint(0, 24, 5000);
 	};											
-	if (autonIndex == 6) {												// Runs auton routine if autonIndex = a number. (5 --> skillsAuton
-		chassis.setPose(-58, -30, 58);
-		pros::delay(2000);
+	if (autonIndex == 8) {												// Runs auton routine if autonIndex = a number. (8 --> skillsAuton
+		chassis.setPose(-61, -24, 90);
 		clamp.set_value(true);
-		pros::delay(2000);
+		pros::delay(300);
 		chassis.moveToPoint(-48, -24, 5000);
-		pros::delay(2000);
+		pros::delay(1250);
 		clamp.set_value(false);
 		intake_mg.move(127);
-		pros::delay(2000);
+		pros::delay(125);
 		chassis.turnToHeading(-90, 2000);
 		chassis.moveToPoint(-24, -24, 2000, {.forwards = false});
 		pros::delay(2000);
@@ -215,13 +217,52 @@ void autonomous() {
 		chassis.moveToPoint(-48, -58, 3000, {.forwards = false});
 		pros::delay(2000);
 		chassis.turnToHeading(270, 2000);
-		chassis.moveToPoint(-62, -62, 3000);
-		pros::delay(2000);
+		chassis.moveToPoint(-64, -64, 3000);
+		pros::delay(1000);
 		chassis.turnToHeading(225, 2000);
-		pros::delay(2000);
 		clamp.set_value(true);
 		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});
-		pros::delay(1000000000);
+		chassis.moveToPoint(-56, 5, 4000);
+		chassis.turnToHeading(26, 3000);
+		chassis.moveToPoint(-48, 24, 2000);
+		clamp.set_value(false);
+		pros::delay(125);
+		chassis.turnToHeading(-90, 2000);
+		chassis.moveToPoint(-24, 24, 2000, {.forwards = false});
+		pros::delay(2000);
+		chassis.turnToHeading(0, 2000);
+		chassis.moveToPoint(-24, 48, 3000, {.forwards = false});
+		pros::delay(2000);
+		chassis.turnToHeading(90, 2000);
+		chassis.moveToPoint(-48, 48, 3000, {.forwards = false});
+		pros::delay(2000);
+		chassis.moveToPoint(-60, 48, 3000, {.forwards = false});
+		pros::delay(2000);
+		chassis.turnToHeading(315, 2000);
+		chassis.moveToPoint(-48, 58, 3000, {.forwards = false});
+		pros::delay(2000);
+		chassis.turnToHeading(270, 2000);
+		chassis.moveToPoint(-64, 64, 3000);
+		pros::delay(1000);
+		chassis.turnToHeading(225, 2000);
+		clamp.set_value(true);
+		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});
+		intake_mg.move(0);
+		chassis.moveToPoint(50, 24, 4000);
+		clamp.set_value(false);
+		pros::delay(125);
+		chassis.moveToPoint(64, 64, 3000);
+		pros::delay(500);
+		clamp.set_value(true);
+		pros::delay(300);
+		chassis.moveToPoint(48, 48, 3000, {.forwards = false});
+		chassis.moveToPoint(48, 0, 3000);
+		clamp.set_value(false);
+		chassis.moveToPoint(64, -64, 3000);
+		pros::delay(500);
+		clamp.set_value(true);
+		pros::delay(300);
+		chassis.moveToPoint(48, -48, 3000, {.forwards = false});
 		intake_mg.move(0);
 	};
 }
