@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-12-19-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-12-30-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -191,22 +191,22 @@ void autonomous() {
 	};											
 	if (autonIndex == 7) {												// Runs auton routine if autonIndex = a number. (7 --> clearLine)
 		chassis.setPose(0, 0, 0);
-		chassis.moveToPoint(0, 24, 5000);
+		chassis.moveToPoint(0, 24, 5000);								// Drive away from line
 	};											
 	if (autonIndex == 8) {												// Runs auton routine if autonIndex = a number. (8 --> skillsAuton
-		chassis.setPose(-61, -24, 90);
-		clamp.set_value(true);
-		pros::delay(300);
-		chassis.moveToPoint(-48, -24, 5000);
-		pros::delay(1250);
-		clamp.set_value(false);
-		intake_mg.move(127);
-		pros::delay(125);
-		chassis.turnToHeading(-90, 2000);
-		chassis.moveToPoint(-24, -24, 2000, {.forwards = false});
-		pros::delay(2000);
-		chassis.turnToHeading(0, 2000);
-		chassis.moveToPoint(-24, -48, 3000, {.forwards = false});
+		chassis.setPose(-61, -24, 90);										// Set Starting Position		
+		clamp.set_value(true);												// Open Clamp
+		pros::delay(300);													// Wait				
+		chassis.moveToPoint(-48, -24, 5000, {.maxSpeed = 50});				// Drive to closest goal, careful not to push it away
+		pros::delay(1250);													// Wait
+		clamp.set_value(false);												// Clamp Goal	
+		intake_mg.move(127);												// Load first ring onto goal
+		pros::delay(125);													// Wait
+		chassis.turnToHeading(-90, 2000);									// Turn away from next ring (we drive backwards to it)
+		chassis.moveToPoint(-24, -24, 2000, {.forwards = false});			// Drive backwards to next ring
+		pros::delay(2000);													// Wait
+		chassis.turnToHeading(0, 2000);										// Turn to next ring, etc.	
+		chassis.moveToPoint(-24, -48, 3000, {.forwards = false});			// Drive to next ring, etc.
 		pros::delay(2000);
 		chassis.turnToHeading(90, 2000);
 		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});
@@ -216,17 +216,17 @@ void autonomous() {
 		chassis.turnToHeading(315, 2000);
 		chassis.moveToPoint(-48, -58, 3000, {.forwards = false});
 		pros::delay(2000);
-		chassis.turnToHeading(270, 2000);
-		chassis.moveToPoint(-64, -64, 3000);
-		pros::delay(1000);
-		chassis.turnToHeading(225, 2000);
-		clamp.set_value(true);
-		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});
-		chassis.moveToPoint(-56, 5, 4000);
-		chassis.turnToHeading(26, 3000);
-		chassis.moveToPoint(-48, 24, 2000);
-		clamp.set_value(false);
-		pros::delay(125);
+		chassis.turnToHeading(270, 2000);									// Face nearest corner
+		chassis.moveToPoint(-64, -64, 3000);								// Drive to corner				
+		pros::delay(1000);													// Wait			
+		chassis.turnToHeading(225, 2000);									// Turn partially
+		clamp.set_value(true);												// Open Clamp				
+		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});			// Drive out of corner
+		chassis.moveToPoint(-56, 5, 4000);									// Drive towards next mobile goal		
+		chassis.turnToHeading(26, 3000);									// Turn to face next mobile goal
+		chassis.moveToPoint(-48, 24, 2000, {.maxSpeed = 50});				// Slowly approach next mobile goal
+		clamp.set_value(false);												// Clamp next mobile goal
+		pros::delay(125);													// repeat above steps for this goal
 		chassis.turnToHeading(-90, 2000);
 		chassis.moveToPoint(-24, 24, 2000, {.forwards = false});
 		pros::delay(2000);
@@ -247,23 +247,24 @@ void autonomous() {
 		chassis.turnToHeading(225, 2000);
 		clamp.set_value(true);
 		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});
-		intake_mg.move(0);
-		chassis.moveToPoint(50, 24, 4000);
-		clamp.set_value(false);
-		pros::delay(125);
-		chassis.moveToPoint(64, 64, 3000);
-		pros::delay(500);
-		clamp.set_value(true);
-		pros::delay(300);
-		chassis.moveToPoint(48, 48, 3000, {.forwards = false});
-		chassis.moveToPoint(48, 0, 3000);
-		clamp.set_value(false);
-		chassis.moveToPoint(64, -64, 3000);
-		pros::delay(500);
-		clamp.set_value(true);
-		pros::delay(300);
-		chassis.moveToPoint(48, -48, 3000, {.forwards = false});
-		intake_mg.move(0);
+		intake_mg.move(0);													// Stop Intake
+		chassis.moveToPoint(41, 27, 3500);									// Drive to one of the mogos with blue ring on it
+		chassis.moveToPoint(50, 24, 3000);									// Approach the goal slowly
+		clamp.set_value(false);												// Clamp the goal						
+		pros::delay(125);													// Wait
+		chassis.moveToPoint(64, 64, 3000);									// Drive to the corner			
+		pros::delay(500);													// Wait				
+		clamp.set_value(true);												// Open Clamp				
+		pros::delay(300);													// Wait				
+		chassis.moveToPoint(48, 48, 3000, {.forwards = false});				// Drive out of corner
+		chassis.moveToPoint(48, 12, 2500);									// Drive to the middle mogo (instead of other one with blue ring to avoid crash)					
+		chassis.moveToPoint(48, 0, 2500 {.maxSpeed = 50});					// Approach the goal slowly
+		clamp.set_value(false);												// Clamp the goal
+		chassis.moveToPoint(64, -64, 3000);									// Drive to the corner
+		pros::delay(500);													// Wait				
+		clamp.set_value(true);												// Open Clamp				
+		pros::delay(300);													// Wait
+		chassis.moveToPoint(48, -48, 3000, {.forwards = false});			// Drive out of corner
 	};
 }
 
