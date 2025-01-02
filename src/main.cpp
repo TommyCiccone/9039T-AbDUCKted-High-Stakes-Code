@@ -14,7 +14,7 @@ pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Contr
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports 1, 2, 3
 pros::MotorGroup right_mg({4, 5, -7}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 7
 pros::MotorGroup intake_mg({8, 6});									// Creates Intake Motor Group with ports 6, 8
-pros::Motor ally(9, pros::MotorGearset::green);						// Creates Alliance Stake Lift Motor on port 9
+pros::Motor ally(20, pros::MotorGearset::green);						// Creates Alliance Stake Lift Motor on port 9
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
 pros::Imu inertial(10);												// Initialize Inertial Sensor on port 10					
 
@@ -72,6 +72,7 @@ lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller o
 void initialize() {
 	inertial.reset();
 	chassis.calibrate();
+	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);				// Set Brake Mode to Brake
 	master.rumble("-.. ..- -.-. -.-");								// Rumble Controller to Indicate Calibration Complete
 																	// Morse code for duck as an easter egg.
 
@@ -152,49 +153,63 @@ void autonomous() {
 		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};
 	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> ally1)
-		chassis.setPose(58.6, -24, 180);								// Set Starting Position
-		chassis.moveToPoint(58.6, 0, 5000, {.forwards = false});		// Drive to rings adjacent to ally stake, push out of way
+		chassis.setPose(56, -24, 0);										// Set Starting Position
+		chassis.moveToPoint(56, -2, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to rings adjacent to ally stake, push out of way
 		chassis.turnToHeading(270, 2000);								// Turn to away from ally stake (lift is on back of robot);
-		ally.move_relative(-120, 127);									// Place preload on ally stake	
+		pros::delay(100);												// Wait
+		chassis.moveToPoint(64, -2, 3000, {.forwards = false});			// Drive to stake
+		pros::delay(400);												// Wait
+		ally.move_relative(-300, 127);									// Place preload on ally stake	
 		pros::delay(1000);												// Wait
 		chassis.moveToPoint(48, -24, 5000);								// Drive partway to goal
+		pros::delay(100);												// Wait
 		chassis.turnToHeading(270, 2000);								// Turn to face goal
+		pros::delay(100);												// Wait
 		clamp.set_value(true);											// Extend Clamp
 		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to goal
-		pros::delay(500);												// Wait
+		pros::delay(200);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
-		intake_mg.move(127);											// Deposit Preload Ring onto Goal
-		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
-		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
+		intake_mg.move(127);						
+		pros::delay(2000);												// Wait
+		chassis.turnToHeading(0, 2000);								// Turn to Face Ring Stack South of Goal
+		chassis.moveToPoint(24, -46, 5000, {.forwards = false});			// Drive to Ring Stack, Knock Off Top Ring
 		pros::delay(1250);												// Wait
-		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
+		chassis.moveToPoint(24, -54, 5000, {.forwards = false});			// Drive Reverse to Assist Intake
 		pros::delay(3000);												// Wait
 		intake_mg.move(0);												// Stop Intake
-		chassis.turnToHeading(180, 2000);								// Turn to Face Ladder
-		chassis.moveToPoint(24, -4, 5000, {.forwards = false});			// Drive to Ladder
+		chassis.turnToHeading(180, -2000, {.maxSpeed = 84});				// Turn to Face Ladder
+		pros::delay(250);												// Wait
+		chassis.moveToPoint(24, 4, -5000, {.forwards = false, .maxSpeed = 84});		// Drive to Ladder
 		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};	
 	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (4 --> ally2)
-		chassis.setPose(58.6, 24, 0);								// Set Starting Position
-		chassis.moveToPoint(58.6, 0, 5000, {.forwards = false});		// Drive to rings adjacent to ally stake, push out of way
+		chassis.setPose(55.5, 24, 0);									// Set Starting Position
+		chassis.moveToPoint(55, 2, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to rings adjacent to ally stake, push out of way
 		chassis.turnToHeading(270, 2000);								// Turn to away from ally stake (lift is on back of robot);
-		ally.move_relative(-120, 127);									// Place preload on ally stake	
-		pros::delay(1000);												// Wait
+		pros::delay(100);												// Wait
+		chassis.moveToPoint(64, 2, 3000, {.forwards = false});			// Drive to stake
+		pros::delay(200);												// Wait
+		ally.move_relative(-300, 127);									// Place preload on ally stake	
+		pros::delay(500);												// Wait
 		chassis.moveToPoint(48, 24, 5000);								// Drive partway to goal
+		pros::delay(250);												// Wait
 		chassis.turnToHeading(270, 2000);								// Turn to face goal
+		pros::delay(250);												// Wait
 		clamp.set_value(true);											// Extend Clamp
 		chassis.moveToPoint(24, 24, 5000, {.maxSpeed = 84});			// Drive to goal
-		pros::delay(500);												// Wait
+		pros::delay(1750);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
-		intake_mg.move(127);											// Deposit Preload Ring onto Goal
+		intake_mg.move(127);						
+		pros::delay(200);												// Wait
 		chassis.turnToHeading(180, 2000);								// Turn to Face Ring Stack South of Goal
 		chassis.moveToPoint(24, 46, 5000, {.forwards = false});			// Drive to Ring Stack, Knock Off Top Ring
-		pros::delay(1250);												// Wait
+		pros::delay(750);												// Wait
 		chassis.moveToPoint(24, 54, 5000, {.forwards = false});			// Drive Reverse to Assist Intake
 		pros::delay(3000);												// Wait
 		intake_mg.move(0);												// Stop Intake
-		chassis.turnToHeading(0, 2000);									// Turn to Face Ladder
-		chassis.moveToPoint(24, 4, 5000, {.forwards = false});			// Drive to Ladder
+		chassis.turnToHeading(0, 2000, {.maxSpeed = 84});				// Turn to Face Ladder
+		pros::delay(250);												// Wait
+		chassis.moveToPoint(24, 4, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to Ladder
 		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};
 	if (autonIndex == 5) {											// Runs auton routine if autonIndex = a number. (5 --> old1)
@@ -345,6 +360,16 @@ void opcontrol() {
 			intake_mg.move(0);										// Stop Motors
 		};
 
+		// Ally Flipper Control
+		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
+			ally.move(-127);											// Spins Motors Forward
+		};
+		if (master.get_digital(DIGITAL_B)) {						// Is controller B Pressed?
+			ally.move(127);										// Spins Motors Reverse
+		}; 
+		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
+			ally.move(0);											// Stops Motors
+		};
 		pros::delay(10);                               				// Wait 10ms
 	};
 }
