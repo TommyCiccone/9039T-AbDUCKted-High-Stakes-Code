@@ -13,7 +13,7 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Controller
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports 1, 2, 3
 pros::MotorGroup right_mg({4, 5, -7}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 7
-pros::MotorGroup intake_mg({8, 6});									// Creates Intake Motor Group with ports 6, 8
+pros::MotorGroup intake_mg({-8, 6});									// Creates Intake Motor Group with ports 6, 8
 pros::Motor ally(20, pros::MotorGearset::green);						// Creates Alliance Stake Lift Motor on port 9
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
 pros::Imu inertial(10);												// Initialize Inertial Sensor on port 10					
