@@ -17,6 +17,7 @@ pros::MotorGroup intake_mg({-8, 6});									// Creates Intake Motor Group with 
 pros::Motor ally(20, pros::MotorGearset::green);						// Creates Alliance Stake Lift Motor on port 9
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
 pros::Imu inertial(10);												// Initialize Inertial Sensor on port 10					
+pros::Rotation hTrack(11);
 
 // LemLib Declarations [From LemLib Template]
 // Declare Drivetrain
@@ -30,7 +31,7 @@ lemlib::Drivetrain drivetrain(&left_mg, 							// left motor group
 // Declare Sensors
 lemlib::OdomSensors sensors(nullptr, 								// vertical tracking wheel 1, set to null
                             nullptr,								// vertical tracking wheel 2, set to null
-                            nullptr, 								// horizontal tracking wheel 1, set to null
+                            &hTrack, 								// horizontal tracking wheel 1, set to null
                             nullptr, 								// horizontal tracking wheel 2, set to null
                             &inertial 								// inertial sensor, set to null
 );
@@ -111,7 +112,7 @@ void disabled() {}
 void competition_initialize() {}
 
 // When Autonomous
-void autonomous() {
+void  autonomous() {
 	intake_mg.move_relative(-720, 127);
 
 
