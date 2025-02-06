@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-12-30-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-02-05-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -12,12 +12,12 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 // Device Declarations
 pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Controller
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports 1, 2, 3
-pros::MotorGroup right_mg({4, 5, -7}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 7
-pros::MotorGroup intake_mg({-8, 6});									// Creates Intake Motor Group with ports 6, 8
-pros::Motor ally(20, pros::MotorGearset::green);						// Creates Alliance Stake Lift Motor on port 9
+pros::MotorGroup right_mg({4, 5, -6}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 6
+pros::MotorGroup intake_mg({-7, 8});								// Creates Intake Motor Group with ports 7, 8
+//pros::MotorGroup lady_brown({x, y});								// Creates Lady Brown Motor Group with ports x, y
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
 pros::Imu inertial(10);												// Initialize Inertial Sensor on port 10					
-pros::Rotation hTrack(11);
+pros::Rotation hTrack(11);											// Initialize Rotation Sensor for Horizontal Tracking Wheel on Port 11.
 
 // LemLib Declarations [From LemLib Template]
 // Declare Drivetrain
@@ -28,10 +28,13 @@ lemlib::Drivetrain drivetrain(&left_mg, 							// left motor group
                               450,						 			// drivetrain rpm is 450
                               2 									// horizontal drift is 2 
 );
+
+lemlib::TrackingWheel horizontal1(&hTrack, lemlib::Omniwheel::NEW_325, -1.5); // Define horizontal tracking wheel for use in odometry
+
 // Declare Sensors
 lemlib::OdomSensors sensors(nullptr, 								// vertical tracking wheel 1, set to null
                             nullptr,								// vertical tracking wheel 2, set to null
-                            &hTrack, 								// horizontal tracking wheel 1, set to null
+                            &horizontal1, 							// horizontal tracking wheel 1, set to horizontal rotation sensor. 
                             nullptr, 								// horizontal tracking wheel 2, set to null
                             &inertial 								// inertial sensor, set to null
 );
@@ -74,10 +77,8 @@ void initialize() {
 	inertial.reset();
 	chassis.calibrate();
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);				// Set Brake Mode to Brake
-	master.rumble("-.. ..- -.-. -.-");								// Rumble Controller to Indicate Calibration Complete
-																	// Morse code for duck as an easter egg.
+	master.rumble("---------------");								// Rumble Controller to Indicate Calibration Complete
 
-// All code here will be moved to "void competition_initialize() later. at the time of testing I don't have a comp switch."
 	lv_obj_set_style_text_font(										// Set font size to 36 pt.
 		lv_scr_act(), 
 		&lv_font_montserrat_36, 
@@ -163,7 +164,7 @@ void  autonomous() {
 		pros::delay(100);												// Wait
 		chassis.moveToPoint(64, -2, 3000, {.forwards = false});			// Drive to stake
 		pros::delay(200);												// Wait
-		ally.move_relative(-300, 127);									// Place preload on ally stake	
+//		ally.move_relative(-300, 127);									// Place preload on ally stake	
 		pros::delay(500);												// Wait
 		chassis.moveToPoint(48, -24, 5000);								// Drive partway to goal
 		pros::delay(250);												// Wait
@@ -193,7 +194,7 @@ void  autonomous() {
 		pros::delay(100);												// Wait
 		chassis.moveToPoint(64, 2, 3000, {.forwards = false});			// Drive to stake
 		pros::delay(200);												// Wait
-		ally.move_relative(-300, 127);									// Place preload on ally stake	
+//		ally.move_relative(-300, 127);									// Place preload on ally stake	
 		pros::delay(500);												// Wait
 		chassis.moveToPoint(48, 24, 5000);								// Drive partway to goal
 		pros::delay(250);												// Wait
@@ -363,7 +364,7 @@ void opcontrol() {
 		if (!master.get_digital(DIGITAL_R1) && !master.get_digital(DIGITAL_R2)) {	// Otherwise
 			intake_mg.move(0);										// Stop Motors
 		};
-
+/*
 		// Ally Flipper Control
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
 			ally.move(-127);											// Spins Motors Forward
@@ -374,6 +375,7 @@ void opcontrol() {
 		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
 			ally.move(0);											// Stops Motors
 		};
+*/
 		pros::delay(10);                               				// Wait 10ms
 	};
 }
