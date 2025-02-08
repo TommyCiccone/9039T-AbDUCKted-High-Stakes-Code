@@ -222,7 +222,7 @@ void  autonomous() {
 		chassis.setPose(60, -24, 270);									// Set Starting Position
 		chassis.moveToPoint(38.25, -15, 5000);							// Drive Part Way to Goal
 		chassis.turnToHeading(237, 2000);								// Turn to Face Goal
-		chassis.moveToPoint(24, -24, 5000);								// Drive to Goal 
+		chassis.moveToPoint(23.16, -23.45, 5000);								// Drive to Goal 
 		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
 		pros::delay(500);
@@ -243,7 +243,7 @@ void  autonomous() {
 		chassis.turnToHeading(242.5, 2000);								// Turn
 		chassis.moveToPoint(38.25, 15, 5000);							// Drive part way to goal
 		chassis.turnToHeading(303, 2000);								// Turn to face goal
-		chassis.moveToPoint(24, 24, 8000);								// Slowly approach goal, to avoid pushing it away
+		chassis.moveToPoint(23.16, 23.45, 8000);						// Slowly approach goal, to avoid pushing it away
 		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal
 		pros::delay(500);
