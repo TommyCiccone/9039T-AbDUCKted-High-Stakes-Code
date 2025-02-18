@@ -1,23 +1,26 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-02-05-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-02-17-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
 // Include Libraries
 #include "main.h"													// Include PROS Core Library
 #include "project/auton.hpp"										// Include Auton Header File
+//#include "project/ladyBrown.hpp"									// Include Lady Brown Header File
 #include "liblvgl/lvgl.h"											// Include LVGL, a lightweight graphics library
-#include "lemlib/api.hpp"											// Include LemLib, for easy autonomous and odometry
+#include "lemlib/api.hpp"											// Include LemLib, for easy autonomous and odometry)
 
 // Device Declarations
 pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Controller
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports 1, 2, 3
 pros::MotorGroup right_mg({4, 5, -6}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 6
 pros::MotorGroup intake_mg({-7, 8});								// Creates Intake Motor Group with ports 7, 8
-//pros::MotorGroup lady_brown({x, y});								// Creates Lady Brown Motor Group with ports x, y
+pros::Motor lady_brown(10);										// Creates Lady Brown Motor with port 10
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
-pros::Imu inertial(10);												// Initialize Inertial Sensor on port 10					
+pros::ADIDigitalOut doinker ('B');									// Initialize Doinker Piston on port B
+pros::Imu inertial(12);												// Initialize Inertial Sensor on port 12					
 pros::Rotation hTrack(11);											// Initialize Rotation Sensor for Horizontal Tracking Wheel on Port 11.
+pros::Rotation lbSensor(13);										// Initialize Rotation Sensor for Lady Brown Pivot axle on port 13.
 
 // LemLib Declarations [From LemLib Template]
 // Declare Drivetrain
@@ -72,9 +75,15 @@ int autonIndex = 0;													// Declares an int for storing the selected auto
 lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());				// Creates activeScreen parent object
 lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent
 
+// Lady Brown Functions
+
+
+
 // When Start
 void initialize() {
 	inertial.reset();
+	hTrack.reset();
+	lbSensor.reset();
 	chassis.calibrate();
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);				// Set Brake Mode to Brake
 	master.rumble("---------------");								// Rumble Controller to Indicate Calibration Complete
@@ -105,6 +114,18 @@ void initialize() {
 	lv_obj_set_size(autonRoller, 470, 220);							// Configure size & position of roller object
 	lv_obj_center(autonRoller);
 }
+
+/*
+namespace ladyBrown {
+    void moveToTarget(int targetPosition) {
+		lady_brown.move_velocity(27);
+		while (abs((abs(360 - lbSensor.get_position()) - targetPosition)) > 5) {
+			pros::delay(10);
+		};
+		lady_brown.move_velocity(0);
+    }
+}
+*/
 
 // When Disabled
 void disabled() {}
@@ -364,6 +385,42 @@ void opcontrol() {
 		if (!master.get_digital(DIGITAL_R1) && !master.get_digital(DIGITAL_R2)) {	// Otherwise
 			intake_mg.move(0);										// Stop Motors
 		};
+
+		// Doinker Control
+		if (master.get_digital(DIGITAL_UP)) {						// Is Up Arrow Pressed?
+			doinker.set_value(true);									// Set Solenoid to True	
+		};
+		if (master.get_digital(DIGITAL_DOWN)) {						// Is Down Arrow Pressed?
+			doinker.set_value(false);									// Set Solenoid to False
+		};
+
+		// Lady Brown Motor Control - Hold Mode
+		if (master.get_digital(DIGITAL_A)) {						// Is Controller L1 Pressed?
+			lady_brown.move(127);									// Spin Motors Forward
+		};
+		if (master.get_digital(DIGITAL_B)) {						// Is controller L2 Pressed?
+			lady_brown.move(-127);									// Spin Motors Reverse
+		}; 
+		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
+			lady_brown.move(0);										// Stop Motors
+		};
+
+/*
+		// Lady Brown Control
+		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
+			ladyBrown::moveToTarget(0);								// Move to Target Position
+		};
+		if (master.get_digital(DIGITAL_B)) {						// Is Controller B Pressed?
+			ladyBrown::moveToTarget(30);								// Move to Target Position
+		};
+		if (master.get_digital(DIGITAL_X)) {						// Is Controller X Pressed?
+			ladyBrown::moveToTarget(10);								// Move to Target Position
+		};
+		if (master.get_digital(DIGITAL_Y)) {						// Is Controller Y Pressed?
+			ladyBrown::moveToTarget(90);								// Move to Target Position
+		};
+*/
+
 /*
 		// Ally Flipper Control
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
