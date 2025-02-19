@@ -1,24 +1,30 @@
-#pragma once
+#pragma once                                                // Only include once
 
-#include "main.h"
+#include "main.h"                                           // Include PROS Core Library                   
 
-extern pros::Motor lady_brown;
-extern pros::Rotation lbSensor;
+extern pros::Motor lady_brown;                              // Declare Lady Brown Motor (external, declared in main.cpp)
+extern pros::Rotation lbSensor;                             // Declare rotation sensor (external)
 
-namespace ladyBrown {
-    void moveToTarget(int targetPosition = 0) {
-        int currentPosition = lbSensor.get_position();
-        int error = targetPosition - currentPosition;
-        int threshold = 5;
+namespace ladyBrown {                                       // Declare namespace for Lady Brown           
+    void moveToTarget(int targetPosition = 0) {             // Declare function moveToTarget ladyBrown::moveToTarget
+        int currentPosition = lbSensor.get_position();      // Get current position of rotation sensor
+        int error = currentPosition - targetPosition;       // Calculate error between current position and target position
+        int threshold = 5;                                  // Set Threshold for error
+        int motorSpeed = 0;                                 // Declare motorSpeed variable
 
-        while (abs(error) > threshold) {
-            currentPosition = lbSensor.get_position();
-            error = targetPosition - currentPosition;
+        int kp = .5;                                        // Set Proportional Gain        
+//      int ki = 0;
+//      int kd = 0;
 
-            int motorSpeed = error * 1.2;
-            lady_brown.move_velocity(motorSpeed);
-            pros::delay(10);
+        if (abs(error) > threshold) {                       // If error is greater than threshold
+            currentPosition = lbSensor.get_position();      // Get current position of rotation sensor
+            error = currentPosition - targetPosition;       // Calculate error between current position and target position
+            
+            motorSpeed = error * kp;                        // Calculate motorSpeed based on error and kp
+
+            lady_brown.move_velocity(motorSpeed);           // Move Lady Brown Motor at motorSpeed
         };
-        lady_brown.move_velocity(0);
+
+        lady_brown.move_velocity(0);                        // Stop Lady Brown Motor
     };
 }
