@@ -115,17 +115,29 @@ void initialize() {
 	lv_obj_center(autonRoller);
 }
 
-/*
-namespace ladyBrown {
-    void moveToTarget(int targetPosition) {
-		lady_brown.move_velocity(27);
-		while (abs((abs(360 - lbSensor.get_position()) - targetPosition)) > 5) {
-			pros::delay(10);
-		};
-		lady_brown.move_velocity(0);
-    }
+namespace ladyBrown {                                       // Declare namespace for Lady Brown           
+    void moveToTarget(int targetPosition = 0) {             // Declare function moveToTarget ladyBrown::moveToTarget
+        int currentPosition = lbSensor.get_position();      // Get current position of rotation sensor
+        int error = currentPosition - targetPosition;       // Calculate error between current position and target position
+        int threshold = 5;                                  // Set Threshold for error
+        int motorSpeed = 0;                                 // Declare motorSpeed variable
+
+        int kp = .5;                                        // Set Proportional Gain        
+//      int ki = 0;
+//      int kd = 0;
+
+        if (abs(error) > threshold) {                       // If error is greater than threshold
+            currentPosition = lbSensor.get_position();      // Get current position of rotation sensor
+            error = currentPosition - targetPosition;       // Calculate error between current position and target position
+            
+            motorSpeed = error * kp;                        // Calculate motorSpeed based on error and kp
+
+            lady_brown.move_velocity(motorSpeed);           // Move Lady Brown Motor at motorSpeed
+        };
+
+        lady_brown.move_velocity(0);                        // Stop Lady Brown Motor
+    };
 }
-*/
 
 // When Disabled
 void disabled() {}
@@ -394,7 +406,7 @@ void opcontrol() {
 			doinker.set_value(false);									// Set Solenoid to False
 		};
 
-		// Lady Brown Motor Control - Hold Mode
+/*		// Lady Brown Motor Control - Hold Mode
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller L1 Pressed?
 			lady_brown.move(127);									// Spin Motors Forward
 		};
@@ -404,8 +416,8 @@ void opcontrol() {
 		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
 			lady_brown.move(0);										// Stop Motors
 		};
+*/
 
-/*
 		// Lady Brown Control
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
 			ladyBrown::moveToTarget(0);								// Move to Target Position
@@ -419,7 +431,7 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_Y)) {						// Is Controller Y Pressed?
 			ladyBrown::moveToTarget(90);								// Move to Target Position
 		};
-*/
+
 
 /*
 		// Ally Flipper Control
