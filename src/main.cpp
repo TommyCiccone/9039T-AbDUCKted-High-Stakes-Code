@@ -72,12 +72,26 @@ lemlib::Chassis chassis(drivetrain, 								// drivetrain settings
 
 // UI Declarations
 int autonIndex = 0;													// Declares an int for storing the selected auton routine.
+int colorIndex = 0;														// Declares an int for storing the selected color.
 lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());				// Creates activeScreen parent object
 lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent
+lv_obj_t * colorRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent`
 
-// Lady Brown Functions
+void color_roller_event_handler(lv_event_t * e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * roller = lv_event_get_target(e);
 
-
+    if (code == LV_EVENT_VALUE_CHANGED) {
+        int selected = lv_roller_get_selected(roller);
+        if (selected == 1) { // Red
+            lv_obj_set_style_bg_color(roller, lv_color_hex(0xFF0000), LV_PART_SELECTED);
+        } else if (selected == 2) { // Blue
+            lv_obj_set_style_bg_color(roller, lv_color_hex(0x0000FF), LV_PART_SELECTED);
+        } else {
+			lv_obj_set_style_bg_color(roller, lv_color_hex(0xFFFF00), LV_PART_SELECTED);
+		};
+    };
+}
 
 // When Start
 void initialize() {
@@ -90,10 +104,11 @@ void initialize() {
 
 	lv_obj_set_style_text_font(										// Set font size to 36 pt.
 		lv_scr_act(), 
-		&lv_font_montserrat_36, 
+		&lv_font_montserrat_18, 
 		LV_PART_MAIN | LV_STATE_DEFAULT
 	);
-	lv_obj_set_size(activeScreen, 470, 220);						// Configure size & position of activeScreen Parent
+	// Configure Auton Roller
+	lv_obj_set_size(activeScreen, 480, 220);						// Configure size & position of activeScreen Parent
 	lv_obj_center(activeScreen);
     lv_roller_set_options(											// Configure Roller
 		autonRoller, 
@@ -111,8 +126,29 @@ void initialize() {
 		lv_color_hex(0x000000), 
 		LV_PART_SELECTED
 	);
-	lv_obj_set_size(autonRoller, 470, 220);							// Configure size & position of roller object
-	lv_obj_center(autonRoller);
+	lv_obj_set_size(autonRoller, 238, 220);							// Configure size & position of roller object
+	lv_obj_align(autonRoller, LV_ALIGN_LEFT_MID, 0, 0);
+
+	// Configure Color Roller
+	lv_roller_set_options(
+		colorRoller,
+		color::colorNames.c_str(),
+		LV_ROLLER_MODE_NORMAL
+	);
+	lv_roller_set_visible_row_count(colorRoller, 2);
+	lv_obj_set_style_bg_color(
+		colorRoller,
+		lv_color_hex(0xFFFF00),
+		LV_PART_SELECTED
+	);
+	lv_obj_set_style_text_color(
+		colorRoller,
+		lv_color_hex(0x000000),
+		LV_PART_SELECTED
+	);
+	lv_obj_set_size(colorRoller, 238, 220);						// Configure size & position of roller object
+	lv_obj_align(colorRoller, LV_ALIGN_RIGHT_MID, 0, 0);
+	lv_obj_add_event_cb(colorRoller, color_roller_event_handler, LV_EVENT_ALL, NULL);
 }
 
 namespace ladyBrown {                                       // Declare namespace for Lady Brown           
