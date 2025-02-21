@@ -6,6 +6,7 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 // Include Libraries
 #include "main.h"													// Include PROS Core Library
 #include "project/auton.hpp"										// Include Auton Header File
+#include <iostream>
 //#include "project/ladyBrown.hpp"									// Include Lady Brown Header File
 #include "liblvgl/lvgl.h"											// Include LVGL, a lightweight graphics library
 #include "lemlib/api.hpp"											// Include LemLib, for easy autonomous and odometry)
@@ -15,7 +16,7 @@ pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Contr
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports 1, 2, 3
 pros::MotorGroup right_mg({4, 5, -6}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 6
 pros::MotorGroup intake_mg({-7, 8});								// Creates Intake Motor Group with ports 7, 8
-pros::Motor lady_brown(10);										// Creates Lady Brown Motor with port 10
+pros::Motor lady_brown(-10);											// Creates Lady Brown Motor with port 10
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
 pros::ADIDigitalOut doinker ('B');									// Initialize Doinker Piston on port B
 pros::Imu inertial(12);												// Initialize Inertial Sensor on port 12					
@@ -72,12 +73,26 @@ lemlib::Chassis chassis(drivetrain, 								// drivetrain settings
 
 // UI Declarations
 int autonIndex = 0;													// Declares an int for storing the selected auton routine.
+int colorIndex = 0;														// Declares an int for storing the selected color.
 lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());				// Creates activeScreen parent object
 lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent
+lv_obj_t * colorRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent`
 
-// Lady Brown Functions
+void color_roller_event_handler(lv_event_t * e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * roller = lv_event_get_target(e);
 
-
+    if (code == LV_EVENT_VALUE_CHANGED) {
+        int selected = lv_roller_get_selected(roller);
+        if (selected == 1) { // Red
+            lv_obj_set_style_bg_color(roller, lv_color_hex(0xFF0000), LV_PART_SELECTED);
+        } else if (selected == 2) { // Blue
+            lv_obj_set_style_bg_color(roller, lv_color_hex(0x0000FF), LV_PART_SELECTED);
+        } else {
+			lv_obj_set_style_bg_color(roller, lv_color_hex(0xFFFF00), LV_PART_SELECTED);
+		};
+    };
+}
 
 // When Start
 void initialize() {
@@ -85,15 +100,18 @@ void initialize() {
 	hTrack.reset();
 	lbSensor.reset();
 	chassis.calibrate();
+	lady_brown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	lady_brown.set_zero_position(0);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);				// Set Brake Mode to Brake
 	master.rumble("---------------");								// Rumble Controller to Indicate Calibration Complete
 
 	lv_obj_set_style_text_font(										// Set font size to 36 pt.
 		lv_scr_act(), 
-		&lv_font_montserrat_36, 
+		&lv_font_montserrat_18, 
 		LV_PART_MAIN | LV_STATE_DEFAULT
 	);
-	lv_obj_set_size(activeScreen, 470, 220);						// Configure size & position of activeScreen Parent
+	// Configure Auton Roller
+	lv_obj_set_size(activeScreen, 480, 220);						// Configure size & position of activeScreen Parent
 	lv_obj_center(activeScreen);
     lv_roller_set_options(											// Configure Roller
 		autonRoller, 
@@ -111,21 +129,55 @@ void initialize() {
 		lv_color_hex(0x000000), 
 		LV_PART_SELECTED
 	);
-	lv_obj_set_size(autonRoller, 470, 220);							// Configure size & position of roller object
-	lv_obj_center(autonRoller);
+	lv_obj_set_size(autonRoller, 238, 220);							// Configure size & position of roller object
+	lv_obj_align(autonRoller, LV_ALIGN_LEFT_MID, 0, 0);
+
+	// Configure Color Roller
+	lv_roller_set_options(
+		colorRoller,
+		color::colorNames.c_str(),
+		LV_ROLLER_MODE_NORMAL
+	);
+	lv_roller_set_visible_row_count(colorRoller, 2);
+	lv_obj_set_style_bg_color(
+		colorRoller,
+		lv_color_hex(0xFFFF00),
+		LV_PART_SELECTED
+	);
+	lv_obj_set_style_text_color(
+		colorRoller,
+		lv_color_hex(0x000000),
+		LV_PART_SELECTED
+	);
+	lv_obj_set_size(colorRoller, 238, 220);						// Configure size & position of roller object
+	lv_obj_align(colorRoller, LV_ALIGN_RIGHT_MID, 0, 0);
+	lv_obj_add_event_cb(colorRoller, color_roller_event_handler, LV_EVENT_ALL, NULL);
 }
 
-/*
-namespace ladyBrown {
-    void moveToTarget(int targetPosition) {
-		lady_brown.move_velocity(27);
-		while (abs((abs(360 - lbSensor.get_position()) - targetPosition)) > 5) {
-			pros::delay(10);
-		};
-		lady_brown.move_velocity(0);
-    }
-}
-*/
+namespace ladyBrown {                                       // Declare namespace for Lady Brown           
+    void moveToTarget(int targetPosition) {             	// Declare function moveToTarget ladyBrown::moveToTarget
+        int currentPosition = lbSensor.get_position();      // Get current position of rotation sensor
+        int error = currentPosition - targetPosition;       // Calculate error between current position and target position
+        int threshold = 5;                                  // Set Threshold for error
+
+        while (abs(error) > threshold) {                       // If error is greater than threshold
+            currentPosition = lbSensor.get_position();      // Get current position of rotation sensor
+            error = currentPosition - targetPosition;       // Calculate error between current position and target position
+            
+			if (error > 0) {
+				lady_brown.move_relative(-10, 127);
+				pros::delay(1000);
+			};	// Move Lady Brown Motor at motorSpeed
+			if (error < 0) {
+				lady_brown.move_relative(10, 127);
+				pros::delay(1000);
+			};	// Move Lady Brown Motor at motorSpeed
+		
+        };
+
+        lady_brown.move_velocity(0);                        // Stop Lady Brown Motor
+	};
+};
 
 // When Disabled
 void disabled() {}
@@ -140,7 +192,11 @@ void  autonomous() {
 
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
 	if (autonIndex == 0) {};										// Runs auton routine if autonIndex = a number. (0 --> disabled)
-	if (autonIndex == 1) {											// Runs auton routine if autonIndex = a number. (1 --> sugar1)
+	if (autonIndex == 1) {											// Runs auton routine if autonIndex = a number. (1 --> ganza1)
+
+	};										
+	if (autonIndex == 2) {};										// Runs auton routine if autonIndex = a number. (2 --> ganza2)
+	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (1 --> sugar1)
 		chassis.setPose(60, -24, 270);									// Set Starting Position
 		clamp.set_value(true);											// Extended Clamp
 		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
@@ -159,7 +215,7 @@ void  autonomous() {
 		chassis.moveToPoint(24, -4, 5000, {.forwards = false});			// Drive to Ladder
 		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};										
-	if (autonIndex == 2) {											// Runs auton routine if autonIndex = a number. (2 --> sugar2)
+	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (2 --> sugar2)
 		chassis.setPose(60, 24, 270);									// Turn to face goal
 		clamp.set_value(true);											// Extend Clamp
 		chassis.moveToPoint(24, 24, 5000, {.maxSpeed = 84});			// Slowly approach goal, to avoid pushing it away
@@ -178,7 +234,7 @@ void  autonomous() {
 		chassis.moveToPoint(24, 4, 5000, {.forwards = false});			// Drive to ladder
 		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};
-	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (3 --> ally1)
+	if (autonIndex == 5) {											// Runs auton routine if autonIndex = a number. (3 --> ally1)
 		chassis.setPose(55.5, -24, 180);									// Set Starting Position
 		chassis.moveToPoint(55, -2, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to rings adjacent to ally stake, push out of way
 		chassis.turnToHeading(270, 2000);								// Turn to away from ally stake (lift is on back of robot);
@@ -208,7 +264,7 @@ void  autonomous() {
 		chassis.moveToPoint(24, -4, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to Ladder
 		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};	
-	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (4 --> ally2)
+	if (autonIndex == 6) {											// Runs auton routine if autonIndex = a number. (4 --> ally2)
 		chassis.setPose(55.5, 24, 0);									// Set Starting Position
 		chassis.moveToPoint(55, 2, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to rings adjacent to ally stake, push out of way
 		chassis.turnToHeading(270, 2000);								// Turn to away from ally stake (lift is on back of robot);
@@ -238,7 +294,7 @@ void  autonomous() {
 		chassis.moveToPoint(24, 4, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to Ladder
 		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};
-	if (autonIndex == 5) {											// Runs auton routine if autonIndex = a number. (5 --> old1)
+	if (autonIndex == 7) {											// Runs auton routine if autonIndex = a number. (5 --> old1)
 		clamp.set_value(true);											// Extended Clamp
 		chassis.setPose(60, -24, 270);									// Set Starting Position
 		chassis.moveToPoint(38.25, -15, 5000);							// Drive Part Way to Goal
@@ -258,7 +314,7 @@ void  autonomous() {
 		pros::delay(10000);												// Wait
 		intake_mg.move(0);												// Stop Intake
 	};											
-	if (autonIndex == 6) {											// Runs auton routine if autonIndex = a number. (6 --> old2)
+	if (autonIndex == 8) {											// Runs auton routine if autonIndex = a number. (6 --> old2)
 		clamp.set_value(true);											// Extend Clamp
 		chassis.setPose(60, 24, 270);									// Set Start Position
 		chassis.turnToHeading(242.5, 2000);								// Turn
@@ -279,11 +335,11 @@ void  autonomous() {
 		pros::delay(10000);												// Wait
 		intake_mg.move(0);												// Stop
 	};											
-	if (autonIndex == 7) {												// Runs auton routine if autonIndex = a number. (7 --> clearLine)
+	if (autonIndex == 9) {												// Runs auton routine if autonIndex = a number. (7 --> clearLine)
 		chassis.setPose(0, 0, 0);
 		chassis.moveToPoint(0, 36, 5000);								// Drive away from line
 	};											
-	if (autonIndex == 8) {												// Runs auton routine if autonIndex = a number. (8 --> skillsAuton)
+	if (autonIndex == 10) {												// Runs auton routine if autonIndex = a number. (8 --> skillsAuton)
 		chassis.setPose(-61, -24, 90);										// Set Starting Position		
 		clamp.set_value(true);												// Open Clamp
 		pros::delay(300);													// Wait				
@@ -396,19 +452,19 @@ void opcontrol() {
 
 		// Lady Brown Motor Control - Hold Mode
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller L1 Pressed?
-			lady_brown.move(127);									// Spin Motors Forward
+			lady_brown.move_velocity(20);									// Spin Motors Forward
 		};
 		if (master.get_digital(DIGITAL_B)) {						// Is controller L2 Pressed?
-			lady_brown.move(-127);									// Spin Motors Reverse
+			lady_brown.move_velocity(-20);									// Spin Motors Reverse
 		}; 
 		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
-			lady_brown.move(0);										// Stop Motors
+			lady_brown.move_velocity(0);										// Stop Motors
 		};
 
 /*
 		// Lady Brown Control
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
-			ladyBrown::moveToTarget(0);								// Move to Target Position
+			ladyBrown::moveToTarget(5);								// Move to Target Position
 		};
 		if (master.get_digital(DIGITAL_B)) {						// Is Controller B Pressed?
 			ladyBrown::moveToTarget(30);								// Move to Target Position
