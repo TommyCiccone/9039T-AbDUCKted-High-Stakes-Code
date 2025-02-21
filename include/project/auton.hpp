@@ -9,5 +9,5 @@ namespace auton {                                          // Creates "auton" na
 
 namespace color {
     const std::string colorNames =                         // List of colors to be selected for display
-        "Disable Color Sensing\nRed Alliance\nBlue Alliance\nBoth Colors\n";
+        "9039T";
 };
