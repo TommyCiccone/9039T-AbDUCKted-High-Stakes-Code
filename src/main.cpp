@@ -8,10 +8,9 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 #include "liblvgl/lvgl.h"											// Include LVGL, a lightweight graphics library
 #include "lemlib/api.hpp"											// Include LemLib, for easy autonomous and odometry)
 
-#include "project/auton.hpp"										// Include Auton Header File
 #include "project/ui.hpp"											// Include UI Header File
+#include "project/uiElements.hpp"									// Include Auton Header File
 #include "project/uiEventHandler.hpp"								// Include UI Event Handler Header File
-//#include "project/ladyBrown.hpp"									// Include Lady Brown Header File
 
 
 // Device Declarations
@@ -19,12 +18,10 @@ pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Contr
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports 1, 2, 3
 pros::MotorGroup right_mg({4, 5, -6}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 6
 pros::MotorGroup intake_mg({-7, 8});								// Creates Intake Motor Group with ports 7, 8
-pros::Motor lady_brown(-10);											// Creates Lady Brown Motor with port 10
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
 pros::ADIDigitalOut doinker ('B');									// Initialize Doinker Piston on port B
 pros::Imu inertial(12);												// Initialize Inertial Sensor on port 12					
 pros::Rotation hTrack(11);											// Initialize Rotation Sensor for Horizontal Tracking Wheel on Port 11.
-pros::Rotation lbSensor(13);										// Initialize Rotation Sensor for Lady Brown Pivot axle on port 13.
 
 // LemLib Declarations [From LemLib Template]
 // Declare Drivetrain
@@ -103,15 +100,12 @@ void color_roller_event_handler(lv_event_t * e) {
 void initialize() {
 	inertial.reset();
 	hTrack.reset();
-	lbSensor.reset();
 	chassis.calibrate();
 	intake_mg.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	lady_brown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	lady_brown.set_zero_position(0);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);				// Set Brake Mode to Brake
 	master.rumble("---------------");								// Rumble Controller to Indicate Calibration Complete
 
-	setupGUI();
+	setupUI();
 
 /*
 	lv_obj_set_style_text_font(										// Set font size to 36 pt.
@@ -198,7 +192,7 @@ void competition_initialize() {}
 
 // When Autonomous
 void  autonomous() {
-	lady_brown.move_velocity(127);
+//	lady_brown.move_velocity(127);
 
 
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
@@ -464,7 +458,7 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_DOWN)) {						// Is Down Arrow Pressed?
 			doinker.set_value(false);									// Set Solenoid to False
 		};
-
+/*
 		// Lady Brown Motor Control - Hold Mode
 		if (master.get_digital(DIGITAL_B)) {						// Is Controller L1 Pressed?
 			lady_brown.move_velocity(127);									// Spin Motors Forward
@@ -475,7 +469,7 @@ void opcontrol() {
 		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
 			lady_brown.move_velocity(0);										// Stop Motors
 		};
-
+*/
 /*
 		// Lady Brown Control
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
@@ -489,19 +483,6 @@ void opcontrol() {
 		};
 		if (master.get_digital(DIGITAL_Y)) {						// Is Controller Y Pressed?
 			ladyBrown::moveToTarget(90);								// Move to Target Position
-		};
-*/
-
-/*
-		// Ally Flipper Control
-		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
-			ally.move(-127);											// Spins Motors Forward
-		};
-		if (master.get_digital(DIGITAL_B)) {						// Is controller B Pressed?
-			ally.move(127);										// Spins Motors Reverse
-		}; 
-		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
-			ally.move(0);											// Stops Motors
 		};
 */
 		pros::delay(10);                               				// Wait 10ms
