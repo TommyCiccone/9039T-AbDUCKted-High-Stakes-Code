@@ -5,11 +5,14 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 
 // Include Libraries
 #include "main.h"													// Include PROS Core Library
-#include "project/auton.hpp"										// Include Auton Header File
-#include <iostream>
-//#include "project/ladyBrown.hpp"									// Include Lady Brown Header File
 #include "liblvgl/lvgl.h"											// Include LVGL, a lightweight graphics library
 #include "lemlib/api.hpp"											// Include LemLib, for easy autonomous and odometry)
+
+#include "project/auton.hpp"										// Include Auton Header File
+#include "project/ui.hpp"											// Include UI Header File
+#include "project/uiEventHandler.hpp"								// Include UI Event Handler Header File
+//#include "project/ladyBrown.hpp"									// Include Lady Brown Header File
+
 
 // Device Declarations
 pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Controller
@@ -73,11 +76,12 @@ lemlib::Chassis chassis(drivetrain, 								// drivetrain settings
 
 // UI Declarations
 int autonIndex = 0;													// Declares an int for storing the selected auton routine.
-int colorIndex = 0;														// Declares an int for storing the selected color.
+int colorIndex = 0;													// Declares an int for storing the selected color.
 lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());				// Creates activeScreen parent object
 lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent
 lv_obj_t * colorRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent`
 
+/*
 void color_roller_event_handler(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * roller = lv_event_get_target(e);
@@ -93,6 +97,7 @@ void color_roller_event_handler(lv_event_t * e) {
 		};
     };
 }
+*/
 
 // When Start
 void initialize() {
@@ -106,6 +111,9 @@ void initialize() {
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);				// Set Brake Mode to Brake
 	master.rumble("---------------");								// Rumble Controller to Indicate Calibration Complete
 
+	setupGUI();
+
+/*
 	lv_obj_set_style_text_font(										// Set font size to 36 pt.
 		lv_scr_act(), 
 		&lv_font_montserrat_18, 
@@ -153,8 +161,9 @@ void initialize() {
 	lv_obj_set_size(colorRoller, 238, 220);						// Configure size & position of roller object
 	lv_obj_align(colorRoller, LV_ALIGN_RIGHT_MID, 0, 0);
 	lv_obj_add_event_cb(colorRoller, color_roller_event_handler, LV_EVENT_ALL, NULL);
+*/
 }
-
+/*
 namespace ladyBrown {                                       // Declare namespace for Lady Brown           
     void moveToTarget(int targetPosition) {             	// Declare function moveToTarget ladyBrown::moveToTarget
         int currentPosition = lbSensor.get_position();      // Get current position of rotation sensor
@@ -179,6 +188,7 @@ namespace ladyBrown {                                       // Declare namespace
         lady_brown.move_velocity(0);                        // Stop Lady Brown Motor
 	};
 };
+*/
 
 // When Disabled
 void disabled() {}
