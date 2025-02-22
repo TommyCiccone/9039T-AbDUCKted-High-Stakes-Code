@@ -187,7 +187,7 @@ void competition_initialize() {}
 
 // When Autonomous
 void  autonomous() {
-	intake_mg.move_relative(-720, 127);
+	lady_brown.move_relative(720, 127);
 
 
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
