@@ -7,7 +7,7 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 #include "main.h"													// Include PROS Core Library
 #include "project/auton.hpp"										// Include Auton Header File
 #include <iostream>
-//#include "project/ladyBrown.hpp"									// Include Lady Brown Header File
+#include <thread>
 #include "liblvgl/lvgl.h"											// Include LVGL, a lightweight graphics library
 #include "lemlib/api.hpp"											// Include LemLib, for easy autonomous and odometry)
 
@@ -22,6 +22,7 @@ pros::ADIDigitalOut doinker ('B');									// Initialize Doinker Piston on port 
 pros::Imu inertial(12);												// Initialize Inertial Sensor on port 12					
 pros::Rotation hTrack(11);											// Initialize Rotation Sensor for Horizontal Tracking Wheel on Port 11.
 pros::Rotation lbSensor(13);										// Initialize Rotation Sensor for Lady Brown Pivot axle on port 13.
+pros::Optical colorSensor(14);										// Initialize Color Sensor on port 14				
 
 // LemLib Declarations [From LemLib Template]
 // Declare Drivetrain
@@ -73,7 +74,10 @@ lemlib::Chassis chassis(drivetrain, 								// drivetrain settings
 
 // UI Declarations
 int autonIndex = 0;													// Declares an int for storing the selected auton routine.
-int colorIndex = 0;														// Declares an int for storing the selected color.
+int colorIndex = 0;													// Declares an int for storing the selected color.
+int colorRangeLowerBound = 0;										// Declares an int for storing the selected color range.
+int colorRangeUpperBound = 0;										// Declares an int for storing the selected color range.
+int currentColor = 500;
 lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());				// Creates activeScreen parent object
 lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent
 lv_obj_t * colorRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent`
@@ -155,7 +159,7 @@ void initialize() {
 }
 
 namespace ladyBrown {                                       // Declare namespace for Lady Brown           
-    void moveToTarget(int targetPosition) {             	// Declare function moveToTarget ladyBrown::moveToTarget
+    int moveToTarget(int targetPosition) {             	// Declare function moveToTarget ladyBrown::moveToTarget
         int currentPosition = lbSensor.get_position();      // Get current position of rotation sensor
         int error = currentPosition - targetPosition;       // Calculate error between current position and target position
         int threshold = 5;                                  // Set Threshold for error
@@ -176,6 +180,8 @@ namespace ladyBrown {                                       // Declare namespace
         };
 
         lady_brown.move_velocity(0);                        // Stop Lady Brown Motor
+
+		return 0;
 	};
 };
 
@@ -185,22 +191,51 @@ void disabled() {}
 // When Connect to Field Control
 void competition_initialize() {}
 
+bool stopVision = false;
+
+void doVision() {
+	while (!stopVision) {
+			currentColor = colorSensor.get_hue();
+			if (currentColor > colorRangeLowerBound && currentColor < colorRangeUpperBound) {
+				break;
+			}
+		}
+}
+
+void runAuton() {
+
+}
+
 // When Autonomous
-void  autonomous() {
+void autonomous() {
 	lady_brown.move_relative(720, 127);
 
-
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
-	if (autonIndex == 0) {};										// Runs auton routine if autonIndex = a number. (0 --> disabled)
-	if (autonIndex == 1) {											// Runs auton routine if autonIndex = a number. (1 --> ganza1)
+	colorIndex = lv_roller_get_selected(colorRoller);				// Sets colorIndex to index of currently selected roller item
 
-	};										
+	if (colorIndex == 0) {
+		colorRangeLowerBound = 1000; //not real colors; will not stop
+		colorRangeUpperBound = 1001;
+	}
+	if (colorIndex == 1) {
+		colorRangeLowerBound = 220; //will stop if sees blue
+		colorRangeUpperBound = 235;
+	}
+	if (colorIndex == 2) {
+		colorRangeLowerBound = 350; //will stop if sees red
+		colorRangeUpperBound = 5;
+	}
+
+
+
+	if (autonIndex == 0) {};										// Runs auton routine if autonIndex = a number. (0 --> disabled)
+	if (autonIndex == 1) {};											// Runs auton routine if autonIndex = a number. (1 --> ganza1);										
 	if (autonIndex == 2) {};										// Runs auton routine if autonIndex = a number. (2 --> ganza2)
 	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (1 --> sugar1)
-		chassis.setPose(60, -24, 270);									// Set Starting Position
-		clamp.set_value(true);											// Extended Clamp
-		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
-		pros::delay(2000);												// Wait
+	chassis.setPose(60, -24, 270);									// Set Starting Position
+	clamp.set_value(true);											// Extended Clamp
+	chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
+	pros::delay(2000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
 		pros::delay(500);												// Wait
 		intake_mg.move(127);											// Deposit Preload Ring onto Goal
