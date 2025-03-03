@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-02-17-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-03-02-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -75,8 +75,10 @@ lemlib::Chassis chassis(drivetrain, 								// drivetrain settings
 // UI Declarations
 int autonIndex = 0;													// Declares an int for storing the selected auton routine.
 int colorIndex = 0;													// Declares an int for storing the selected color.
-int colorRangeLowerBound = 0;										// Declares an int for storing the selected color range.
-int colorRangeUpperBound = 0;										// Declares an int for storing the selected color range.
+int autonOpticsColorRangeLowerBound = 0;										// Declares an int for storing the selected color range.
+int autonOpticsColorRangeUpperBound = 0;										// Declares an int for storing the selected color range.
+int lbColorRangeLowerBound = 0;												// Declares an int for storing the selected color range.
+int lbColorRangeUpperBound = 0;												// Declares an int for storing the selected color range.
 int currentColor = 500;
 lv_obj_t * activeScreen = lv_obj_create(lv_scr_act());				// Creates activeScreen parent object
 lv_obj_t * autonRoller = lv_roller_create(activeScreen);			// Creates a roller object as a child of the activeScreen parent
@@ -191,21 +193,6 @@ void disabled() {}
 // When Connect to Field Control
 void competition_initialize() {}
 
-bool stopVision = false;
-
-void doVision() {
-	while (!stopVision) {
-			currentColor = colorSensor.get_hue();
-			if (currentColor > colorRangeLowerBound && currentColor < colorRangeUpperBound) {
-				break;
-			}
-		}
-}
-
-void runAuton() {
-
-}
-
 // When Autonomous
 void autonomous() {
 	lady_brown.move_relative(720, 127);
@@ -214,16 +201,22 @@ void autonomous() {
 	colorIndex = lv_roller_get_selected(colorRoller);				// Sets colorIndex to index of currently selected roller item
 
 	if (colorIndex == 0) {
-		colorRangeLowerBound = 1000; //not real colors; will not stop
-		colorRangeUpperBound = 1001;
+		autonOpticsColorRangeLowerBound = 1000; //not real colors; will not stop
+		autonOpticsColorRangeUpperBound = 1001;
+		lbColorRangeLowerBound = 1000; //not real colors; will not activate lady brown.
+		lbColorRangeUpperBound = 1001;
 	}
 	if (colorIndex == 1) {
-		colorRangeLowerBound = 220; //will stop if sees blue
-		colorRangeUpperBound = 235;
+		autonOpticsColorRangeLowerBound = 220; //will stop if sees blue
+		autonOpticsColorRangeUpperBound = 235;
+		lbColorRangeLowerBound = 350; //will activate lb when red
+		lbColorRangeUpperBound = 5;
 	}
 	if (colorIndex == 2) {
-		colorRangeLowerBound = 350; //will stop if sees red
-		colorRangeUpperBound = 5;
+		autonOpticsColorRangeLowerBound = 350; //will stop if sees red
+		autonOpticsColorRangeUpperBound = 5;
+		lbColorRangeLowerBound = 220; //will activate lb when blue
+		lbColorRangeUpperBound = 235;
 	}
 
 
@@ -449,6 +442,37 @@ void autonomous() {
 	};
 }
 
+bool ladyBrownTaskRunning = false;
+
+void ladyBrownAutomation(void* param) {
+    intake_mg.move(127); // Spin intake motors forward
+    lady_brown.move_absolute(20, 127); // Keep Lady Brown motor up
+
+    while (true) {
+		ladyBrownTaskRunning = true; // Set the task running flag to true
+        int detectedColor = colorSensor.get_hue(); // Get the detected color hue
+
+        // Check if the detected color is within the specified range
+        if ((detectedColor >= lbColorRangeLowerBound && detectedColor <= lbColorRangeUpperBound) ||
+            (lbColorRangeLowerBound > lbColorRangeUpperBound && 
+             (detectedColor >= lbColorRangeLowerBound || detectedColor <= lbColorRangeUpperBound))) {
+            pros::delay(1000); // Wait for a set amount of time
+            break; // Stop the loop
+        }
+
+        // Check if the Y button is pressed to cancel the operation
+        if (master.get_digital(DIGITAL_Y)) {
+            break; // Stop the loop
+        }
+
+        pros::delay(10); // Small delay to prevent CPU overload
+    }
+
+    intake_mg.move(0); // Stop intake motors
+    lady_brown.move_velocity(0); // Stop Lady Brown motor
+    lady_brown.move_absolute(0, 127); // Move Lady Brown motor back to zero position
+	ladyBrownTaskRunning = false; // Set the task running flag to false
+}
 
 // When Driver Control
 void opcontrol() {
@@ -484,6 +508,12 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_DOWN)) {						// Is Down Arrow Pressed?
 			doinker.set_value(false);									// Set Solenoid to False
 		};
+/*
+		if (master.get_digital(DIGITAL_B) && !ladyBrownTaskRunning) {
+            ladyBrownTaskRunning = true;
+            pros::Task ladyBrownTask(ladyBrownAutomation, nullptr, "LadyBrownAutomation");
+        }
+*/
 
 		// Lady Brown Motor Control - Hold Mode
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller L1 Pressed?
