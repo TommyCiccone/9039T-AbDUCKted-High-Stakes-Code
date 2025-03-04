@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-03-02-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-03-03-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -15,8 +15,8 @@ pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-
 pros::Controller master(pros::E_CONTROLLER_MASTER); 				// Creates Primary Controller
 pros::MotorGroup left_mg({-1, -2, 3}, pros::MotorGearset::blue);	// Creates Left Drive Motor Group with ports 1, 2, 3
 pros::MotorGroup right_mg({4, 5, -6}, pros::MotorGearset::blue);  	// Creates Right Drive Motor Group with ports 4, 5, 6
-pros::MotorGroup intake_mg({-7, 8});								// Creates Intake Motor Group with ports 7, 8
-pros::Motor lady_brown(-10);											// Creates Lady Brown Motor with port 10
+pros::Motor conveyor(-7);                                           // Creates Conveyor Motor with port 7
+pros::Motor intake(8);pros::Motor lady_brown(-10);					// Creates Lady Brown Motor with port 10
 pros::ADIDigitalOut clamp ('A');									// Initialize Goal Clamp Piston on port A
 pros::ADIDigitalOut doinker ('B');									// Initialize Doinker Piston on port B
 pros::Imu inertial(12);												// Initialize Inertial Sensor on port 12					
@@ -193,9 +193,12 @@ void disabled() {}
 // When Connect to Field Control
 void competition_initialize() {}
 
+bool didAuton = false;
+
 // When Autonomous
 void autonomous() {
-	lady_brown.move_relative(720, 127);
+	didAuton = true;
+//	lady_brown.move_relative(720, 127);
 
 	autonIndex = lv_roller_get_selected(autonRoller);				// Sets autonIndex to index of currently selected roller item
 	colorIndex = lv_roller_get_selected(colorRoller);				// Sets colorIndex to index of currently selected roller item
@@ -220,28 +223,41 @@ void autonomous() {
 	}
 
 
-
 	if (autonIndex == 0) {};										// Runs auton routine if autonIndex = a number. (0 --> disabled)
-	if (autonIndex == 1) {};											// Runs auton routine if autonIndex = a number. (1 --> ganza1);										
+	if (autonIndex == 1) {
+		chassis.setPose(52, 15.5, 0);
+		pros::delay(1000);
+		chassis.moveToPoint(52, 0, 3000, {.forwards = false});
+		pros::delay(1000);
+		chassis.turnToHeading(270, 2000);
+		pros::delay(1000);
+		chassis.moveToPoint(60, 0, 3000, {.forwards = false, .maxSpeed = 25});
+		pros::delay(1000);
+		lady_brown.move_relative(4320, 127);
+
+	};											// Runs auton routine if autonIndex = a number. (1 --> ganza1);										
 	if (autonIndex == 2) {};										// Runs auton routine if autonIndex = a number. (2 --> ganza2)
 	if (autonIndex == 3) {											// Runs auton routine if autonIndex = a number. (1 --> sugar1)
-	chassis.setPose(60, -24, 270);									// Set Starting Position
-	clamp.set_value(true);											// Extended Clamp
-	chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
-	pros::delay(2000);												// Wait
+		chassis.setPose(60, -24, 270);									// Set Starting Position
+		clamp.set_value(true);											// Extended Clamp
+		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
+		pros::delay(2000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
 		pros::delay(500);												// Wait
-		intake_mg.move(127);											// Deposit Preload Ring onto Goal
+		intake.move(127);
+		conveyor.move(127);											// Deposit Preload Ring onto Goal
 		pros::delay(750);												// Wait
 		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
 		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
 		pros::delay(1250);												// Wait
 		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
 		pros::delay(3000);												// Wait
-		intake_mg.move(0);												// Stop Intake
+		intake.move(0);
+    	conveyor.move(0);												// Stop Intake
 		chassis.turnToHeading(180, 2000);								// Turn to Face Ladder
 		chassis.moveToPoint(24, -4, 5000, {.forwards = false});			// Drive to Ladder
-		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
+		intake.move(127);
+		conveyor.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};										
 	if (autonIndex == 4) {											// Runs auton routine if autonIndex = a number. (2 --> sugar2)
 		chassis.setPose(60, 24, 270);									// Turn to face goal
@@ -250,78 +266,24 @@ void autonomous() {
 		pros::delay(2000);												// Wait
 		clamp.set_value(false);											// Clamp Goal
 		pros::delay(500);												// Wait
-		intake_mg.move(127);											// Deposit Preload ring onto goal
+		intake.move(127);
+		conveyor.move(127);											// Deposit Preload ring onto goal
 		pros::delay(750);												// Wait
 		chassis.turnToHeading(180, 2000);								// Turn to face ring stack North of goal
 		chassis.moveToPoint(24, 46, 5000, {.forwards = false});			// Drive to ring stack
 		pros::delay(1250);												// Wait
 		chassis.moveToPoint(24, 54, 5000, {.forwards = false});			// Drive reverse to assist intake
 		pros::delay(3000);												// Wait
-		intake_mg.move(0);												// Stop
+		intake.move(0);
+        conveyor.move(0);												// Stop
 		chassis.turnToHeading(0, 2000);									// Turn to face ladder
 		chassis.moveToPoint(24, 4, 5000, {.forwards = false});			// Drive to ladder
-		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
+		intake.move(127);
+		conveyor.move(127);											// Start intake again just in case ring doesn't make it to goal
 	};
-	if (autonIndex == 5) {											// Runs auton routine if autonIndex = a number. (3 --> ally1)
-		chassis.setPose(55.5, -24, 180);									// Set Starting Position
-		chassis.moveToPoint(55, -2, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to rings adjacent to ally stake, push out of way
-		chassis.turnToHeading(270, 2000);								// Turn to away from ally stake (lift is on back of robot);
-		pros::delay(100);												// Wait
-		chassis.moveToPoint(64, -2, 3000, {.forwards = false});			// Drive to stake
-		pros::delay(200);												// Wait
-//		ally.move_relative(-300, 127);									// Place preload on ally stake	
-		pros::delay(500);												// Wait
-		chassis.moveToPoint(48, -24, 5000);								// Drive partway to goal
-		pros::delay(250);												// Wait
-		chassis.turnToHeading(270, 2000);								// Turn to face goal
-		pros::delay(250);												// Wait
-		clamp.set_value(true);											// Extend Clamp
-		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to goal
-		pros::delay(1750);												// Wait
-		clamp.set_value(false);											// Clamp Goal (retract clamp)
-		intake_mg.move(127);						
-		pros::delay(200);												// Wait
-		chassis.turnToHeading(0, 2000);								// Turn to Face Ring Stack South of Goal
-		chassis.moveToPoint(24, -46, 5000, {.forwards = false});			// Drive to Ring Stack, Knock Off Top Ring
-		pros::delay(750);												// Wait
-		chassis.moveToPoint(24, -54, 5000, {.forwards = false});			// Drive Reverse to Assist Intake
-		pros::delay(2000);												// Wait
-		intake_mg.move(180);												// Stop Intake
-		chassis.turnToHeading(180, 2000, {.maxSpeed = 84});				// Turn to Face Ladder
-		pros::delay(250);												// Wait
-		chassis.moveToPoint(24, -4, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to Ladder
-		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
-	};	
-	if (autonIndex == 6) {											// Runs auton routine if autonIndex = a number. (4 --> ally2)
-		chassis.setPose(55.5, 24, 0);									// Set Starting Position
-		chassis.moveToPoint(55, 2, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to rings adjacent to ally stake, push out of way
-		chassis.turnToHeading(270, 2000);								// Turn to away from ally stake (lift is on back of robot);
-		pros::delay(100);												// Wait
-		chassis.moveToPoint(64, 2, 3000, {.forwards = false});			// Drive to stake
-		pros::delay(200);												// Wait
-//		ally.move_relative(-300, 127);									// Place preload on ally stake	
-		pros::delay(500);												// Wait
-		chassis.moveToPoint(48, 24, 5000);								// Drive partway to goal
-		pros::delay(250);												// Wait
-		chassis.turnToHeading(270, 2000);								// Turn to face goal
-		pros::delay(250);												// Wait
-		clamp.set_value(true);											// Extend Clamp
-		chassis.moveToPoint(24, 24, 5000, {.maxSpeed = 84});			// Drive to goal
-		pros::delay(1750);												// Wait
-		clamp.set_value(false);											// Clamp Goal (retract clamp)
-		intake_mg.move(127);						
-		pros::delay(200);												// Wait
-		chassis.turnToHeading(180, 2000);								// Turn to Face Ring Stack South of Goal
-		chassis.moveToPoint(24, 46, 5000, {.forwards = false});			// Drive to Ring Stack, Knock Off Top Ring
-		pros::delay(750);												// Wait
-		chassis.moveToPoint(24, 54, 5000, {.forwards = false});			// Drive Reverse to Assist Intake
-		pros::delay(3000);												// Wait
-		intake_mg.move(0);												// Stop Intake
-		chassis.turnToHeading(0, 2000, {.maxSpeed = 84});				// Turn to Face Ladder
-		pros::delay(250);												// Wait
-		chassis.moveToPoint(24, 4, 5000, {.forwards = false, .maxSpeed = 84});		// Drive to Ladder
-		intake_mg.move(127);											// Start intake again just in case ring doesn't make it to goal
-	};
+	if (autonIndex == 5) {
+		lady_brown.move(127);
+	}
 	if (autonIndex == 7) {											// Runs auton routine if autonIndex = a number. (5 --> old1)
 		clamp.set_value(true);											// Extended Clamp
 		chassis.setPose(60, -24, 270);									// Set Starting Position
@@ -331,16 +293,19 @@ void autonomous() {
 		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
 		pros::delay(500);
-		intake_mg.move_relative(1440, 127);								// Deposit Preload Ring onto Goal
+		intake.move_relative(1440, 127);								// Deposit Preload Ring onto Goal
+		conveyor.move_relative(1440, 127);								// Deposit Preload ring onto goal
 		pros::delay(2000);												// Wait
 		chassis.turnToHeading(180, 2000);
 		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
 		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
 		pros::delay(2000);												// Wait
-		intake_mg.move(127);											// Intake Bottom Ring of Stack, Load onto MoGo
+		intake.move(127);
+		conveyor.move(127);											// Intake Bottom Ring of Stack, Load onto MoGo
 		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
 		pros::delay(10000);												// Wait
-		intake_mg.move(0);												// Stop Intake
+		intake.move(0);
+    	conveyor.move(0);												// Stop Intake
 	};											
 	if (autonIndex == 8) {											// Runs auton routine if autonIndex = a number. (6 --> old2)
 		clamp.set_value(true);											// Extend Clamp
@@ -352,16 +317,19 @@ void autonomous() {
 		pros::delay(1000);												// Wait
 		clamp.set_value(false);											// Clamp Goal
 		pros::delay(500);
-		intake_mg.move_relative(1440, 127);								// Deposit Preload ring onto goal
+		intake.move_relative(1440, 127);								// Deposit Preload ring onto goal
+		conveyor.move_relative(1440, 127);								// Deposit Preload ring onto goal
 		pros::delay(2000);												// Wait
 		chassis.turnToHeading(0, 2000);									
 		chassis.turnToHeading(180, 2000);								// Turn to face ring stack North of goal
 		chassis.moveToPoint(24, 46, 5000, {.forwards = false});			// Drive to ring stack
 		pros::delay(2000);												// Wait
-		intake_mg.move(127);											// Intake and deposit rings
+		intake.move(127);
+		conveyor.move(127);											// Intake and deposit rings
 		chassis.moveToPoint(24, 54, 5000, {.forwards = false});			// Drive reverse to assist intake
 		pros::delay(10000);												// Wait
-		intake_mg.move(0);												// Stop
+		intake.move(0);
+        conveyor.move(0);												// Stop
 	};											
 	if (autonIndex == 9) {												// Runs auton routine if autonIndex = a number. (7 --> clearLine)
 		chassis.setPose(0, 0, 0);
@@ -374,7 +342,8 @@ void autonomous() {
 		chassis.moveToPoint(-48, -24, 5000, {.maxSpeed = 50});				// Drive to closest goal, careful not to push it away
 		pros::delay(1250);													// Wait
 		clamp.set_value(false);												// Clamp Goal	
-		intake_mg.move(127);												// Load first ring onto goal
+		intake.move(127);
+		conveyor.move(127);												// Load first ring onto goal
 		pros::delay(125);													// Wait
 		chassis.turnToHeading(-90, 2000);									// Turn away from next ring (we drive backwards to it)
 		chassis.moveToPoint(-24, -24, 2000, {.forwards = false});			// Drive backwards to next ring
@@ -421,7 +390,8 @@ void autonomous() {
 		chassis.turnToHeading(225, 2000);
 		clamp.set_value(true);
 		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});
-		intake_mg.move(0);													// Stop Intake
+		intake.move(0);
+          conveyor.move(0);													// Stop Intake
 		chassis.moveToPoint(41, 27, 3500);									// Drive to one of the mogos with blue ring on it
 		chassis.moveToPoint(50, 24, 3000);									// Approach the goal slowly
 		clamp.set_value(false);												// Clamp the goal						
@@ -442,10 +412,9 @@ void autonomous() {
 	};
 }
 
-bool ladyBrownTaskRunning = false;
-
-void ladyBrownAutomation(void* param) {
-    intake_mg.move(127); // Spin intake motors forward
+/*void ladyBrownAutomation(void* param) {
+    intake.move(127);
+conveyor.move(127); // Spin intake motors forward
     lady_brown.move_absolute(20, 127); // Keep Lady Brown motor up
 
     while (true) {
@@ -458,24 +427,30 @@ void ladyBrownAutomation(void* param) {
              (detectedColor >= lbColorRangeLowerBound || detectedColor <= lbColorRangeUpperBound))) {
             pros::delay(1000); // Wait for a set amount of time
             break; // Stop the loop
-        }
+        };
 
         // Check if the Y button is pressed to cancel the operation
         if (master.get_digital(DIGITAL_Y)) {
             break; // Stop the loop
-        }
+        };
 
         pros::delay(10); // Small delay to prevent CPU overload
-    }
+    };
 
-    intake_mg.move(0); // Stop intake motors
-    lady_brown.move_velocity(0); // Stop Lady Brown motor
+    intake.move(0);
+          conveyor.move(0); // Stop intake motors
     lady_brown.move_absolute(0, 127); // Move Lady Brown motor back to zero position
 	ladyBrownTaskRunning = false; // Set the task running flag to false
 }
+*/
+bool ladyBrownTaskRunning = false;
 
 // When Driver Control
 void opcontrol() {
+	if (didAuton = true) {
+		lady_brown.move_relative(-720, 127);
+	};
+
 	while (true) {
 		// Tank Drive Control Scheme
 		int left = master.get_analog(ANALOG_LEFT_Y);   	 			// Gets Left Stick Up/Down Value
@@ -492,13 +467,16 @@ void opcontrol() {
 		
 		// Intake Motor Control - Hold Mode
 		if (master.get_digital(DIGITAL_R1)) {						// Is Controller L1 Pressed?
-			intake_mg.move(127);									// Spin Motors Forward
+			intake.move(127);
+conveyor.move(127);									// Spin Motors Forward
 		};
 		if (master.get_digital(DIGITAL_R2)) {						// Is controller L2 Pressed?
-			intake_mg.move(-127);									// Spin Motors Reverse
+			intake.move(-127);
+        	conveyor.move(-127);									// Spin Motors Reverse
 		}; 
-		if (!master.get_digital(DIGITAL_R1) && !master.get_digital(DIGITAL_R2)) {	// Otherwise
-			intake_mg.move(0);										// Stop Motors
+		if (!master.get_digital(DIGITAL_R1) && !master.get_digital(DIGITAL_R2) && !ladyBrownTaskRunning) {	// Otherwise
+			intake.move(0);
+          conveyor.move(0);										// Stop Motors
 		};
 
 		// Doinker Control
@@ -508,13 +486,37 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_DOWN)) {						// Is Down Arrow Pressed?
 			doinker.set_value(false);									// Set Solenoid to False
 		};
-/*
-		if (master.get_digital(DIGITAL_B) && !ladyBrownTaskRunning) {
+	if (master.get_digital(DIGITAL_B) && !ladyBrownTaskRunning) {
             ladyBrownTaskRunning = true;
-            pros::Task ladyBrownTask(ladyBrownAutomation, nullptr, "LadyBrownAutomation");
-        }
-*/
+            intake.move(127);
+        	conveyor.move(48); // Spin intake motors forward
+            lady_brown.move_relative(720, 127); // Keep Lady Brown motor up
+        };
 
+	if (ladyBrownTaskRunning) {
+	int detectedColor = colorSensor.get_hue(); // Get the detected color hue
+
+	// Check if the detected color is within the specified range
+	if ((detectedColor >= lbColorRangeLowerBound && detectedColor <= lbColorRangeUpperBound) ||
+		(lbColorRangeLowerBound > lbColorRangeUpperBound && 
+		 (detectedColor >= lbColorRangeLowerBound || detectedColor <= lbColorRangeUpperBound))) {
+		pros::delay(410); // Wait for a set amount of time
+		ladyBrownTaskRunning = false; // Stop the task
+	}
+
+	// Check if the Y button is pressed to cancel the operation
+	if (master.get_digital(DIGITAL_Y)) {
+		ladyBrownTaskRunning = false; // Stop the task
+	}
+
+	if (!ladyBrownTaskRunning) {
+		intake.move(0);
+          conveyor.move(0); // Stop intake motors
+		lady_brown.move_relative(-720, 127); // Move Lady Brown motor back to zero position
+	}
+}
+
+/*
 		// Lady Brown Motor Control - Hold Mode
 		if (master.get_digital(DIGITAL_A)) {						// Is Controller L1 Pressed?
 			lady_brown.move_velocity(20);									// Spin Motors Forward
@@ -525,35 +527,8 @@ void opcontrol() {
 		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
 			lady_brown.move_velocity(0);										// Stop Motors
 		};
-
-/*
-		// Lady Brown Control
-		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
-			ladyBrown::moveToTarget(5);								// Move to Target Position
-		};
-		if (master.get_digital(DIGITAL_B)) {						// Is Controller B Pressed?
-			ladyBrown::moveToTarget(30);								// Move to Target Position
-		};
-		if (master.get_digital(DIGITAL_X)) {						// Is Controller X Pressed?
-			ladyBrown::moveToTarget(10);								// Move to Target Position
-		};
-		if (master.get_digital(DIGITAL_Y)) {						// Is Controller Y Pressed?
-			ladyBrown::moveToTarget(90);								// Move to Target Position
-		};
-*/
-
-/*
-		// Ally Flipper Control
-		if (master.get_digital(DIGITAL_A)) {						// Is Controller A Pressed?
-			ally.move(-127);											// Spins Motors Forward
-		};
-		if (master.get_digital(DIGITAL_B)) {						// Is controller B Pressed?
-			ally.move(127);										// Spins Motors Reverse
-		}; 
-		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_B)) {	// Otherwise
-			ally.move(0);											// Stops Motors
-		};
 */
 		pros::delay(10);                               				// Wait 10ms
+
 	};
 }
