@@ -1,5 +1,5 @@
 /* Upload Command:
-pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-03-03-0001"
+pros upload --icon planet --slot 1 --name "abDUCKted" --description "Patch 2024-03-04-0001"
 // Command for PROS termianl to upload program to V5 Brain with correct Name, Description, and Icon
 */
 
@@ -106,6 +106,7 @@ void initialize() {
 	hTrack.reset();
 	lbSensor.reset();
 	chassis.calibrate();
+//	colorSensor.set_led_pwm(255);
 	lady_brown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	lady_brown.set_zero_position(0);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);				// Set Brake Mode to Brake
@@ -211,15 +212,15 @@ void autonomous() {
 	}
 	if (colorIndex == 1) {
 		autonOpticsColorRangeLowerBound = 220; //will stop if sees blue
-		autonOpticsColorRangeUpperBound = 235;
-		lbColorRangeLowerBound = 350; //will activate lb when red
+		autonOpticsColorRangeUpperBound = 255;
+		lbColorRangeLowerBound = 340; //will activate lb when red
 		lbColorRangeUpperBound = 5;
 	}
 	if (colorIndex == 2) {
-		autonOpticsColorRangeLowerBound = 350; //will stop if sees red
+		autonOpticsColorRangeLowerBound = 340; //will stop if sees red
 		autonOpticsColorRangeUpperBound = 5;
 		lbColorRangeLowerBound = 220; //will activate lb when blue
-		lbColorRangeUpperBound = 235;
+		lbColorRangeUpperBound = 255;
 	}
 
 
@@ -448,7 +449,7 @@ bool ladyBrownTaskRunning = false;
 // When Driver Control
 void opcontrol() {
 	if (didAuton = true) {
-		lady_brown.move_relative(-720, 127);
+//		lady_brown.move_relative(-720, 127);
 	};
 
 	while (true) {
