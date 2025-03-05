@@ -106,7 +106,7 @@ void initialize() {
 	hTrack.reset();
 	lbSensor.reset();
 	chassis.calibrate();
-//	colorSensor.set_led_pwm(255);
+	colorSensor.set_led_pwm(255);
 	lady_brown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	lady_brown.set_zero_position(0);
 	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);				// Set Brake Mode to Brake
@@ -285,6 +285,20 @@ void autonomous() {
 	if (autonIndex == 5) {
 		lady_brown.move(127);
 	}
+	if (autonIndex == 6) {
+		chassis.setPose(0, 0, 0);
+		pros::delay(5000);
+		while (true) {
+			chassis.moveToPoint(0, 24, 5000);
+			pros::delay(1000);
+			chassis.turnToHeading(180, 2000);
+			pros::delay(1000);
+			chassis.moveToPoint(0, 0, 5000);
+			pros::delay(1000);
+			chassis.turnToHeading(0, 2000);
+			pros::delay(1000);
+		}
+	}
 	if (autonIndex == 7) {											// Runs auton routine if autonIndex = a number. (5 --> old1)
 		clamp.set_value(true);											// Extended Clamp
 		chassis.setPose(60, -24, 270);									// Set Starting Position
@@ -433,7 +447,7 @@ conveyor.move(127); // Spin intake motors forward
         // Check if the Y button is pressed to cancel the operation
         if (master.get_digital(DIGITAL_Y)) {
             break; // Stop the loop
-        };
+        };	
 
         pros::delay(10); // Small delay to prevent CPU overload
     };
@@ -469,7 +483,7 @@ void opcontrol() {
 		// Intake Motor Control - Hold Mode
 		if (master.get_digital(DIGITAL_R1)) {						// Is Controller L1 Pressed?
 			intake.move(127);
-conveyor.move(127);									// Spin Motors Forward
+			conveyor.move(127);									// Spin Motors Forward
 		};
 		if (master.get_digital(DIGITAL_R2)) {						// Is controller L2 Pressed?
 			intake.move(-127);
@@ -477,7 +491,7 @@ conveyor.move(127);									// Spin Motors Forward
 		}; 
 		if (!master.get_digital(DIGITAL_R1) && !master.get_digital(DIGITAL_R2) && !ladyBrownTaskRunning) {	// Otherwise
 			intake.move(0);
-          conveyor.move(0);										// Stop Motors
+          	conveyor.move(0);										// Stop Motors
 		};
 
 		// Doinker Control
@@ -490,7 +504,7 @@ conveyor.move(127);									// Spin Motors Forward
 	if (master.get_digital(DIGITAL_B) && !ladyBrownTaskRunning) {
             ladyBrownTaskRunning = true;
             intake.move(127);
-        	conveyor.move(48); // Spin intake motors forward
+        	conveyor.move(24); // Spin intake motors forward
             lady_brown.move_relative(720, 127); // Keep Lady Brown motor up
         };
 
@@ -501,7 +515,7 @@ conveyor.move(127);									// Spin Motors Forward
 	if ((detectedColor >= lbColorRangeLowerBound && detectedColor <= lbColorRangeUpperBound) ||
 		(lbColorRangeLowerBound > lbColorRangeUpperBound && 
 		 (detectedColor >= lbColorRangeLowerBound || detectedColor <= lbColorRangeUpperBound))) {
-		pros::delay(410); // Wait for a set amount of time
+		pros::delay(650); // Wait for a set amount of time
 		ladyBrownTaskRunning = false; // Stop the task
 	}
 
