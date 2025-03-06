@@ -504,7 +504,7 @@ void opcontrol() {
 	if (master.get_digital(DIGITAL_B) && !ladyBrownTaskRunning) {
             ladyBrownTaskRunning = true;
             intake.move(127);
-        	conveyor.move(24); // Spin intake motors forward
+        	conveyor.move(36); // Spin intake motors forward
             lady_brown.move_relative(720, 127); // Keep Lady Brown motor up
         };
 
@@ -515,7 +515,7 @@ void opcontrol() {
 	if ((detectedColor >= lbColorRangeLowerBound && detectedColor <= lbColorRangeUpperBound) ||
 		(lbColorRangeLowerBound > lbColorRangeUpperBound && 
 		 (detectedColor >= lbColorRangeLowerBound || detectedColor <= lbColorRangeUpperBound))) {
-		pros::delay(650); // Wait for a set amount of time
+		pros::delay(608); // Wait for a set amount of time
 		ladyBrownTaskRunning = false; // Stop the task
 	}
 
