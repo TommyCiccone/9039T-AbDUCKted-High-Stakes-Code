@@ -227,14 +227,34 @@ void autonomous() {
 	if (autonIndex == 0) {};										// Runs auton routine if autonIndex = a number. (0 --> disabled)
 	if (autonIndex == 1) {
 		chassis.setPose(52, 15.5, 0);
-		pros::delay(1000);
 		chassis.moveToPoint(52, 0, 3000, {.forwards = false});
 		pros::delay(1000);
 		chassis.turnToHeading(270, 2000);
 		pros::delay(1000);
-		chassis.moveToPoint(60, 0, 3000, {.forwards = false, .maxSpeed = 25});
+		chassis.setPose(52, 0, 270);
+		pros::delay(100);
+		chassis.moveToPose(60, 0, 270, 3000, {.forwards = false, .maxSpeed = 69});
 		pros::delay(1000);
 		lady_brown.move_relative(4320, 127);
+		pros::delay(3000);
+		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
+		pros::delay(2000);												// Wait
+		clamp.set_value(false);											// Clamp Goal (retract clamp)
+		pros::delay(500);												// Wait
+		intake.move(127);
+		conveyor.move(127);											// Deposit Preload Ring onto Goal
+		pros::delay(750);												// Wait
+		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
+		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
+		pros::delay(1250);												// Wait
+		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
+		pros::delay(3000);												// Wait
+		intake.move(0);
+    	conveyor.move(0);												// Stop Intake
+		chassis.turnToHeading(180, 2000);								// Turn to Face Ladder
+		chassis.moveToPoint(24, -4, 5000, {.forwards = false});			// Drive to Ladder
+		intake.move(127);
+		conveyor.move(127);											// Start intake again just in case ring doesn't make it to goal
 
 	};											// Runs auton routine if autonIndex = a number. (1 --> ganza1);										
 	if (autonIndex == 2) {};										// Runs auton routine if autonIndex = a number. (2 --> ganza2)
@@ -406,7 +426,7 @@ void autonomous() {
 		clamp.set_value(true);
 		chassis.moveToPoint(-48, -48, 3000, {.forwards = false});
 		intake.move(0);
-          conveyor.move(0);													// Stop Intake
+        conveyor.move(0);													// Stop Intake
 		chassis.moveToPoint(41, 27, 3500);									// Drive to one of the mogos with blue ring on it
 		chassis.moveToPoint(50, 24, 3000);									// Approach the goal slowly
 		clamp.set_value(false);												// Clamp the goal						
@@ -501,35 +521,47 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_DOWN)) {						// Is Down Arrow Pressed?
 			doinker.set_value(false);									// Set Solenoid to False
 		};
-	if (master.get_digital(DIGITAL_B) && !ladyBrownTaskRunning) {
+
+		if (master.get_digital(DIGITAL_B) && !ladyBrownTaskRunning) {
             ladyBrownTaskRunning = true;
             intake.move(127);
         	conveyor.move(36); // Spin intake motors forward
             lady_brown.move_relative(720, 127); // Keep Lady Brown motor up
         };
+/*
+		if (ladyBrownTaskRunning) {
+			int detectedColor = colorSensor.get_hue(); // Get the detected color hue
 
-	if (ladyBrownTaskRunning) {
-	int detectedColor = colorSensor.get_hue(); // Get the detected color hue
+			// Check if the detected color is within the specified range
+			if ((detectedColor >= lbColorRangeLowerBound && detectedColor <= lbColorRangeUpperBound) ||
+				(lbColorRangeLowerBound > lbColorRangeUpperBound && 
+		 		(detectedColor >= lbColorRangeLowerBound || detectedColor <= lbColorRangeUpperBound))) {
+				pros::delay(608); // Wait for a set amount of time
+				ladyBrownTaskRunning = false; // Stop the task
+			}
 
-	// Check if the detected color is within the specified range
-	if ((detectedColor >= lbColorRangeLowerBound && detectedColor <= lbColorRangeUpperBound) ||
-		(lbColorRangeLowerBound > lbColorRangeUpperBound && 
-		 (detectedColor >= lbColorRangeLowerBound || detectedColor <= lbColorRangeUpperBound))) {
-		pros::delay(608); // Wait for a set amount of time
-		ladyBrownTaskRunning = false; // Stop the task
+		// Check if the Y button is pressed to cancel the operation
+		if (master.get_digital(DIGITAL_Y)) {
+			ladyBrownTaskRunning = false; // Stop the task
+		}
+
+		if (!ladyBrownTaskRunning) {
+			intake.move(0);
+          	conveyor.move(0); // Stop intake motors
+			lady_brown.move_relative(-720, 127); // Move Lady Brown motor back to zero position
+		}
+
 	}
+*/
 
-	// Check if the Y button is pressed to cancel the operation
-	if (master.get_digital(DIGITAL_Y)) {
-		ladyBrownTaskRunning = false; // Stop the task
-	}
+		if (master.get_digital(DIGITAL_A)) {
+			lady_brown.move_relative(4320, 127);
+		}
 
-	if (!ladyBrownTaskRunning) {
-		intake.move(0);
-          conveyor.move(0); // Stop intake motors
-		lady_brown.move_relative(-720, 127); // Move Lady Brown motor back to zero position
-	}
-}
+		if (master.get_digital(DIGITAL_X)) {
+			lady_brown.move_relative(-4320, 127);
+		}
+	
 
 /*
 		// Lady Brown Motor Control - Hold Mode
