@@ -228,31 +228,33 @@ void autonomous() {
 	if (autonIndex == 1) {
 		chassis.setPose(52, 15.5, 0);
 		chassis.moveToPoint(52, 0, 3000, {.forwards = false});
-		pros::delay(1000);
+//		pros::delay(500);
 		chassis.turnToHeading(270, 2000);
-		pros::delay(1000);
+		pros::delay(500);
 		chassis.setPose(52, 0, 270);
-		pros::delay(100);
+//		pros::delay(100);
 		chassis.moveToPose(60, 0, 270, 3000, {.forwards = false, .maxSpeed = 69});
-		pros::delay(1000);
+//		pros::delay(100);
+		chassis.moveToPoint(55, 0, 1500);
 		lady_brown.move_relative(4320, 127);
-		pros::delay(3000);
-		chassis.moveToPoint(24, -24, 5000, {.maxSpeed = 84});			// Drive to Goal 
+		pros::delay(2500);
+		clamp.set_value(true);
+		chassis.moveToPoint(29, 29, 4000, {.maxSpeed = 84});
 		pros::delay(2000);												// Wait
 		clamp.set_value(false);											// Clamp Goal (retract clamp)
 		pros::delay(500);												// Wait
 		intake.move(127);
 		conveyor.move(127);											// Deposit Preload Ring onto Goal
 		pros::delay(750);												// Wait
-		chassis.turnToHeading(0, 2000);									// Turn to Face Ring Stack South of Goal
-		chassis.moveToPoint(24, -46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
+		chassis.turnToHeading(180, 2000);									// Turn to Face Ring Stack South of Goal
+		chassis.moveToPoint(24, 46, 5000, {.forwards = false});		// Drive to Ring Stack, Knock Off Top Ring
 		pros::delay(1250);												// Wait
-		chassis.moveToPoint(24, -54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
+		chassis.moveToPoint(24, 54, 5000, {.forwards = false});		// Drive Reverse to Assist Intake
 		pros::delay(3000);												// Wait
 		intake.move(0);
     	conveyor.move(0);												// Stop Intake
-		chassis.turnToHeading(180, 2000);								// Turn to Face Ladder
-		chassis.moveToPoint(24, -4, 5000, {.forwards = false});			// Drive to Ladder
+		chassis.turnToHeading(0, 2000);								// Turn to Face Ladder
+		chassis.moveToPoint(24, 4, 5000, {.forwards = false});			// Drive to Ladder
 		intake.move(127);
 		conveyor.move(127);											// Start intake again just in case ring doesn't make it to goal
 
