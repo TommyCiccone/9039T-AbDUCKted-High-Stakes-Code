@@ -449,6 +449,7 @@ void autonomous() {
 	};
 	if (autonIndex == 11) {												// Runs auton routine if autonIndex = a number. (skills new)
 		chassis.setPose(-61, -24, 90);										// Set Starting Position		
+		lady_brown.move_relative(4320, 127);
 		clamp.set_value(true);												// Open Clamp
 		pros::delay(1000);
 		chassis.moveToPoint(-44, -24, 3000, {.maxSpeed = 54});
@@ -498,8 +499,59 @@ void autonomous() {
 		clamp.set_value(false);
 		pros::delay(500);
 		chassis.moveToPoint(24, -24, 2750);
-
 	}
+	if (autonIndex == 12) {
+		chassis.setPose(-61, -24, 90);
+		lady_brown.move_relative(4320, 127);
+		clamp.set_value(true);
+		pros::delay(1000);
+		chassis.moveToPoint(-44, -24, 3000, {.maxSpeed = 54});
+		pros::delay(1500);
+		clamp.set_value(false);
+		pros::delay(500);
+		conveyor.move(127);
+		chassis.moveToPoint(-69, -69, 5000);
+		clamp.set_value(true);
+		pros::delay(500);
+		chassis.moveToPoint(-48, 24, 10000);
+		chassis.moveToPoint(-48, 28, 3500, {.maxSpeed = 54});
+		pros::delay(1250);
+		clamp.set_value(false);
+		pros::delay(500);
+		chassis.moveToPoint(-69, 69, 3500);
+		pros::delay(750);
+		clamp.set_value(true);
+		pros::delay(500);
+		chassis.moveToPoint(58, 24, 6000);
+		chassis.moveToPoint(64, 20, 3500, {.maxSpeed = 54});
+		pros::delay(1250);
+		clamp.set_value(false);
+		pros::delay(500);
+		chassis.moveToPoint(69, 69, 3500);
+		pros::delay(750);
+		clamp.set_value(true);
+		pros::delay(500);
+		chassis.moveToPoint(58, -24, 6000);
+		chassis.moveToPoint(58, -28, 3500, {.maxSpeed = 54});
+		pros::delay(1250);
+		clamp.set_value(false);
+		pros::delay(500);
+		chassis.moveToPoint(69, -69, 3500);
+		pros::delay(750);
+		clamp.set_value(true);
+		pros::delay(500);
+		chassis.moveToPoint(48, 0, 5000);
+		chassis.moveToPoint(43, 8, 3250, {.maxSpeed = 54});
+		pros::delay(1250);
+		intake.move(127);
+		conveyor.move(127);
+		clamp.set_value(false);
+		pros::delay(500);
+		chassis.moveToPoint(24, 24, 2750);
+		pros::delay(1000);
+		chassis.moveToPoint(22, 26, 2750, {.maxSpeed = 54});
+		pros::delay(1250);
+	};
 }
 
 /*void ladyBrownAutomation(void* param) {
