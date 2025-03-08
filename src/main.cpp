@@ -447,6 +447,59 @@ void autonomous() {
 		pros::delay(300);													// Wait
 		chassis.moveToPoint(48, -48, 3000, {.forwards = false});			// Drive out of corner
 	};
+	if (autonIndex == 11) {												// Runs auton routine if autonIndex = a number. (skills new)
+		chassis.setPose(-61, -24, 90);										// Set Starting Position		
+		clamp.set_value(true);												// Open Clamp
+		pros::delay(1000);
+		chassis.moveToPoint(-44, -24, 3000, {.maxSpeed = 54});
+		pros::delay(1500);
+		clamp.set_value(false);
+		intake.move(127);
+		conveyor.move(127);
+		chassis.moveToPoint(-21, -25, 3000, {.forwards = false});
+		pros::delay(1500);
+		chassis.moveToPoint(-25, -50, 3000, {.forwards = false});
+		pros::delay(1500);
+		chassis.moveToPoint(-64, -48, 6000, {.forwards = false});
+		pros::delay(1500);
+		chassis.moveToPoint(-69, -69, 2500);
+		pros::delay(1000);
+		clamp.set_value(true);
+		chassis.moveToPoint(-48, 24, 10000);
+		chassis.moveToPoint(-48, 28, 3500, {.maxSpeed = 54});
+		pros::delay(1250);
+		clamp.set_value(false);
+		pros::delay(500);
+		chassis.moveToPoint(-69, 69, 3500);
+		pros::delay(750);
+		clamp.set_value(true);
+		pros::delay(500);
+		chassis.moveToPoint(58, 24, 6000);
+		chassis.moveToPoint(64, 20, 3500, {.maxSpeed = 54});
+		pros::delay(1250);
+		clamp.set_value(false);
+		pros::delay(500);
+		chassis.moveToPoint(69, 69, 3500);
+		pros::delay(750);
+		clamp.set_value(true);
+		pros::delay(500);
+		chassis.moveToPoint(58, -24, 6000);
+		chassis.moveToPoint(58, -28, 3500, {.maxSpeed = 54});
+		pros::delay(1250);
+		clamp.set_value(false);
+		pros::delay(500);
+		chassis.moveToPoint(69, -69, 3500);
+		pros::delay(750);
+		clamp.set_value(true);
+		pros::delay(500);
+		chassis.moveToPoint(48, 0, 5000);
+		chassis.moveToPoint(43, 8, 3250, {.maxSpeed = 54});
+		pros::delay(1250);
+		clamp.set_value(false);
+		pros::delay(500);
+		chassis.moveToPoint(24, -24, 2750);
+
+	}
 }
 
 /*void ladyBrownAutomation(void* param) {
