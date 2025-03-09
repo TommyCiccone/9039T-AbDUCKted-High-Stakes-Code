@@ -4,7 +4,7 @@
 
 namespace auton {                                          // Creates "auton" namespace
     const std::string autonNames =                         // List of autons to be selected for display
-        "Disabled\nRegionals Left\nRegionals Right\nSugar Left\nSugar Right\n*Tommy's Shenanigans\n*Not Tommy's Shenanigans\nLeft Old\nRight Old\nClear Line\nSkills Auton\nSkills Beta\nSkills 20\n";                           
+        "Disabled\nRegionals Left\nRegionals Right\nSugar Left\nSugar Right\n*Tommy's Shenanigans\n*Not Tommy's Shenanigans\nLeft Old\nRight Old\nClear Line\nSkills Auton\nSkills Beta\nSkills 20\nSkills 5";                           
 }
 
 namespace color {

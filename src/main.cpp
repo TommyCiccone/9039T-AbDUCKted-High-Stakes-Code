@@ -552,6 +552,21 @@ void autonomous() {
 		chassis.moveToPoint(22, 26, 2750, {.maxSpeed = 54});
 		pros::delay(1250);
 	};
+	if (autonIndex == 13) {
+		chassis.setPose(-61, -24, 90);
+		lady_brown.move_relative(4320, 127);
+		clamp.set_value(true);
+		pros::delay(1000);
+		chassis.moveToPoint(-44, -24, 3000, {.maxSpeed = 54});
+		pros::delay(1500);
+		clamp.set_value(false);
+		pros::delay(500);
+		conveyor.move(127);
+		chassis.moveToPoint(-69, -69, 5000);
+		pros::delay(3000);
+		clamp.set_value(true);
+		pros::delay(500);
+	}
 }
 
 /*void ladyBrownAutomation(void* param) {
